@@ -2,7 +2,9 @@
 $_['text_divido']                      = '<a href="http://divido.com" target="_blank"><img src="view/image/payment/divido.png"></a>';
 
 $_['heading_title']                    = 'Divido';
+$_['text_edit']                        = 'Edit Divido';
 $_['text_payment']                     = 'Payment';
+$_['text_success']                     = 'Success: You have edited the Divido module';
 $_['entry_order_status']               = 'Order status on completion';
 $_['entry_sort_order']                 = 'Sort order';
 $_['entry_status']                     = 'Status';

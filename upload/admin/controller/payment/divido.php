@@ -6,6 +6,8 @@ class ControllerPaymentDivido extends Controller
 {
     const CACHE_KEY_PLANS = 'divido_plans';
 
+    private $tpldata = [];
+
     public function __construct ($registry)
     {
         parent::__construct($registry);
@@ -20,47 +22,47 @@ class ControllerPaymentDivido extends Controller
 
         $this->cache = new Cache('file');
 
+		$this->tpldata['header']      = $this->load->controller('common/header');
+		$this->tpldata['footer']      = $this->load->controller('common/footer');
+		$this->tpldata['column_left'] = $this->load->controller('common/column_left');
         $this->api_key = $this->getVal('divido_api_key');
         if ($this->api_key) {
             Divido::setMerchant($this->api_key);
         }
+
     }
 
     public function index ()
     {
-		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validate()) {
+		if ($this->request->server['REQUEST_METHOD'] == 'POST' && $this->validate()) {
 			$this->model_setting_setting->editSetting('divido', $this->request->post);
 			$this->session->data['success'] = $this->language->get('text_success');
-			$this->redirect($this->url->link('payment/divido', 'token=' . $this->session->data['token'], 'SSL'));
+			$this->response->redirect($this->url->link('payment/divido', 'token=' . $this->session->data['token'], 'SSL'));
 		}
 
         $this->setData();
 
-        $this->template = 'payment/divido.tpl';
-        $this->children = array('common/header', 'common/footer');
+        $template = 'payment/divido.tpl';
 
-        $output      = $this->render(true);
-        $compression = $this->config->get('config_compression');
-        $this->response->setOutput($output, $compression);
+        $output = $this->load->view($template, $this->tpldata);
+        $this->response->setOutput($output);
     }
 
     protected function setData ()
     {
-
-        $this->data['divido_api_key']          = $this->api_key;
-        $this->data['divido_order_status_id']  = $this->getVal('divido_order_status_id');
-        $this->data['divido_status']           = $this->getVal('divido_status');
-        $this->data['divido_sort_order']       = $this->getVal('divido_sort_order');
-        $this->data['divido_title']            = $this->getVal('divido_title');
-        $this->data['divido_description']      = $this->getVal('divido_description');
-        $this->data['divido_prependtoprice']   = $this->getVal('divido_prependtoprice');
-        $this->data['divido_calc_layout']      = $this->getVal('divido_calc_layout');
-        $this->data['divido_productselection'] = $this->getVal('divido_productselection');
-        $this->data['divido_price_threshold']  = $this->getVal('divido_price_threshold');
-        $this->data['divido_planselection']    = $this->getVal('divido_planselection');
-        xdebug_break();
-        $this->data['divido_plans_selected']   = $this->getVal('divido_plans_selected') ?: array();
-        $this->data['divido_plans']            = $this->getPlans();
+        $this->tpldata['divido_api_key']          = $this->api_key;
+        $this->tpldata['divido_order_status_id']  = $this->getVal('divido_order_status_id');
+        $this->tpldata['divido_status']           = $this->getVal('divido_status');
+        $this->tpldata['divido_sort_order']       = $this->getVal('divido_sort_order');
+        $this->tpldata['divido_title']            = $this->getVal('divido_title');
+        $this->tpldata['divido_description']      = $this->getVal('divido_description');
+        $this->tpldata['divido_prependtoprice']   = $this->getVal('divido_prependtoprice');
+        $this->tpldata['divido_calc_layout']      = $this->getVal('divido_calc_layout');
+        $this->tpldata['divido_productselection'] = $this->getVal('divido_productselection');
+        $this->tpldata['divido_price_threshold']  = $this->getVal('divido_price_threshold');
+        $this->tpldata['divido_planselection']    = $this->getVal('divido_planselection');
+        $this->tpldata['divido_plans_selected']   = $this->getVal('divido_plans_selected') ?: array();
+        $this->tpldata['divido_plans']            = $this->getPlans();
     }
 
     protected function getPlans ()
@@ -87,7 +89,7 @@ class ControllerPaymentDivido extends Controller
 
     protected function setBreadcrumbs ()
     {
-        $this->data['breadcrumbs'] = array(
+        $this->tpldata['breadcrumbs'] = array(
             array(
                 'text'      => $this->language->get('text_home'),
                 'href'      =>  $this->url->link('common/home', 'token=' . $this->session->data['token'], 'SSL'),
@@ -108,44 +110,45 @@ class ControllerPaymentDivido extends Controller
 
     protected function setStrings ()
     {
-        $this->data['heading_title']           = $this->language->get('heading_title');
-		$this->data['button_save']             = $this->language->get('button_save');
-		$this->data['button_cancel']           = $this->language->get('button_cancel');
-		$this->data['text_enabled']            = $this->language->get('text_enabled');
-		$this->data['text_disabled']           = $this->language->get('text_disabled');
-		$this->data['entry_order_status']      = $this->language->get('entry_order_status');
-		$this->data['entry_status']            = $this->language->get('entry_status');
-		$this->data['entry_sort_order']        = $this->language->get('entry_sort_order');
-        $this->data['entry_api_key']           = $this->language->get('entry_api_key');
-        $this->data['entry_title']             = $this->language->get('entry_title');
-        $this->data['entry_description']       = $this->language->get('entry_description');
-        $this->data['entry_prependtoprice']    = $this->language->get('entry_prependtoprice');
-        $this->data['entry_calc_layout']  = $this->language->get('entry_calc_layout');
-        $this->data['entry_productselection']  = $this->language->get('entry_productselection');
-        $this->data['entry_planselection']     = $this->language->get('entry_planselection');
-        $this->data['entry_planlist']          = $this->language->get('entry_planlist');
-        $this->data['entry_price_threshold']    = $this->language->get('entry_price_threshold');
+        $this->tpldata['heading_title']           = $this->language->get('heading_title');
+		$this->tpldata['button_save']             = $this->language->get('button_save');
+		$this->tpldata['button_cancel']           = $this->language->get('button_cancel');
+        $this->tpldata['text_edit']               = $this->language->get('text_edit');
+		$this->tpldata['text_enabled']            = $this->language->get('text_enabled');
+		$this->tpldata['text_disabled']           = $this->language->get('text_disabled');
+		$this->tpldata['entry_order_status']      = $this->language->get('entry_order_status');
+		$this->tpldata['entry_status']            = $this->language->get('entry_status');
+		$this->tpldata['entry_sort_order']        = $this->language->get('entry_sort_order');
+        $this->tpldata['entry_api_key']           = $this->language->get('entry_api_key');
+        $this->tpldata['entry_title']             = $this->language->get('entry_title');
+        $this->tpldata['entry_description']       = $this->language->get('entry_description');
+        $this->tpldata['entry_prependtoprice']    = $this->language->get('entry_prependtoprice');
+        $this->tpldata['entry_calc_layout']       = $this->language->get('entry_calc_layout');
+        $this->tpldata['entry_productselection']  = $this->language->get('entry_productselection');
+        $this->tpldata['entry_planselection']     = $this->language->get('entry_planselection');
+        $this->tpldata['entry_planlist']          = $this->language->get('entry_planlist');
+        $this->tpldata['entry_price_threshold']   = $this->language->get('entry_price_threshold');
 
-        $this->data['entry_plans_options']     = array(
+        $this->tpldata['entry_plans_options']     = array(
             'all'      => $this->language->get('entry_plans_options_all'),
             'selected' => $this->language->get('entry_plans_options_selected'),
         );
 
-        $this->data['entry_products_options']  = array(
+        $this->tpldata['entry_products_options']  = array(
             'all'       => $this->language->get('entry_products_options_all'),
             'selected'  => $this->language->get('entry_products_options_selected'),
             'threshold' => $this->language->get('entry_products_options_threshold'),
         );
 
-        $this->data['entry_calc_options'] = array(
+        $this->tpldata['entry_calc_options'] = array(
             'default' => $this->language->get('entry_calc_layout_default'),
             'custom'  => $this->language->get('entry_calc_layout_custom'),
         );
 
-		$this->data['action']                  = $this->url->link('payment/divido', 'token=' . $this->session->data['token'], 'SSL');
-		$this->data['cancel']                  = $this->url->link('extension/payment', 'token=' . $this->session->data['token'], 'SSL');
-		$this->data['error_warning']           = isset($this->error['warning']) ? $this->error['warning'] : '';
-		$this->data['order_statuses']          = $this->model_localisation_order_status->getOrderStatuses();
+		$this->tpldata['action']                  = $this->url->link('payment/divido', 'token=' . $this->session->data['token'], 'SSL');
+		$this->tpldata['cancel']                  = $this->url->link('extension/payment', 'token=' . $this->session->data['token'], 'SSL');
+		$this->tpldata['error_warning']           = isset($this->error['warning']) ? $this->error['warning'] : '';
+		$this->tpldata['order_statuses']          = $this->model_localisation_order_status->getOrderStatuses();
     }
 
     protected function getVal ($key) {

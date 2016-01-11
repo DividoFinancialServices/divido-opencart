@@ -1,22 +1,31 @@
-<?php echo $header; ?>
+<?php echo $header; ?><?php echo $column_left; ?>
 <div id="content">
-  <div class="breadcrumb">
-    <?php foreach ($breadcrumbs as $breadcrumb): ?>
-        <?php echo $breadcrumb['separator']; ?><a href="<?php echo $breadcrumb['href']; ?>"><?php echo $breadcrumb['text']; ?></a>
-    <?php endforeach; ?>
-  </div>
-  <?php if ($error_warning): ?>
-  <div class="warning"><?php echo $error_warning; ?></div>
-  <?php endif; ?>
-  <div class="box">
-    <div class="heading">
-      <h1><img src="view/image/payment.png" alt="" /> <?php echo $heading_title; ?></h1>
-      <div class="buttons"><a onclick="$('#form').submit();" class="button"><?php echo $button_save; ?></a><a href="<?php echo $cancel; ?>" class="button"><?php echo $button_cancel; ?></a></div>
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-right">
+        <button type="submit" form="form-free-checkout" data-toggle="tooltip" title="<?php echo $button_save; ?>" class="btn btn-primary"><i class="fa fa-save"></i></button>
+        <a href="<?php echo $cancel; ?>" data-toggle="tooltip" title="<?php echo $button_cancel; ?>" class="btn btn-default"><i class="fa fa-reply"></i></a></div>
+      <h1><?php echo $heading_title; ?></h1>
+      <ul class="breadcrumb">
+        <?php foreach ($breadcrumbs as $breadcrumb) { ?>
+        <li><a href="<?php echo $breadcrumb['href']; ?>"><?php echo $breadcrumb['text']; ?></a></li>
+        <?php } ?>
+      </ul>
     </div>
+  </div>
+  <div class="container-fluid">
+    <?php if ($error_warning) { ?>
+    <div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> <?php echo $error_warning; ?>
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    <?php } ?>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-pencil"></i> <?php echo $text_edit; ?></h3>
+      </div>
+      <div class="panel-body">
+        <form action="<?php echo $action; ?>" method="post" enctype="multipart/form-data" id="form-free-checkout" class="form-horizontal">
 
-    <div class="content">
-      <form action="<?php echo $action; ?>" method="post" enctype="multipart/form-data" id="form">
-        <div id="tab-general" class="page">
           <table class="form">
 
             <tr>
@@ -24,7 +33,7 @@
               <td><input id="api_key" type="text" name="divido_api_key" value="<?php echo $divido_api_key; ?>" size="60"></td>
             </tr>
 
-            <tr class="hidden">
+            <tr class="divido-hidden">
               <td><?php echo $entry_status; ?></td>
               <td>
                 <select name="divido_status">
@@ -39,7 +48,7 @@
               </td>
             </tr>
 
-            <tr class="hidden">
+            <tr class="divido-hidden">
               <td><?php echo $entry_order_status; ?></td>
               <td>
                 <select name="divido_order_status_id">
@@ -53,27 +62,27 @@
               </td>
             </tr>
 
-            <tr class="hidden">
+            <tr class="divido-hidden">
               <td><?php echo $entry_sort_order; ?></td>
               <td><input type="text" name="divido_sort_order" value="<?php echo $divido_sort_order; ?>" size="1" /></td>
             </tr>
 
-            <tr class="hidden">
+            <tr class="divido-hidden">
               <td><?php echo $entry_title ; ?></td>
               <td><input type="text" name="divido_title" value="<?php echo $divido_title; ?>" ></td>
             </tr>
 
-            <tr class="hidden">
+            <tr class="divido-hidden">
               <td><?php echo $entry_description ; ?></td>
               <td><textarea name="divido_description"><?php echo $divido_description; ?></textarea></td>
             </tr>
 
-            <tr class="hidden">
+            <tr class="divido-hidden">
               <td><?php echo $entry_prependtoprice ; ?></td>
               <td><input type="text" name="divido_prependtoprice" value="<?php echo $divido_prependtoprice; ?>" ></td>
             </tr>
 
-            <tr class="hidden">
+            <tr class="divido-hidden">
               <td><?php echo $entry_calc_layout ; ?></td>
               <td>
                 <select name="divido_calc_layout">
@@ -85,7 +94,7 @@
               
             </tr>
 
-            <tr class="hidden">
+            <tr class="divido-hidden">
               <td><?php echo $entry_productselection ; ?></td>
               <td>
                 <select name="divido_productselection">
@@ -96,12 +105,12 @@
               </td>
             </tr>
 
-            <tr id="price_threshold" class="hidden">
+            <tr id="price_threshold" class="divido-hidden">
               <td><?php echo $entry_price_threshold ; ?></td>
               <td><input type="text" name="divido_price_threshold" value="<?php echo $divido_price_threshold; ?>" ></td>
             </tr>
 
-            <tr class="hidden">
+            <tr class="divido-hidden">
               <td><?php echo $entry_planselection ; ?></td>
               <td>
                 <select name="divido_planselection">
@@ -112,7 +121,7 @@
               </td>
             </tr>
 
-            <tr id="plan_list" class="hidden">
+            <tr id="plan_list" class="divido-hidden">
               <td valign="top"><?php echo $entry_planlist ; ?></td>
               <td>
               <?php foreach ($divido_plans as $plan): $checked = in_array($plan->id, $divido_plans_selected) ? 'checked' : null; ?>
@@ -125,15 +134,17 @@
             </tr>
 
           </table>
-        </div>
-      </form>
+
+        </form>
+      </div>
     </div>
   </div>
 </div>
 <script>
 (function($) {
+    console.log('lala');
     if ($('#api_key').val() == '') {
-        $('tr.hidden').hide();
+        $('tr.divido-hidden').hide();
     }
 
 })(jQuery);
