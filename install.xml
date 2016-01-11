@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+    <name>Divido Product Tab</name>
+	<code>00005</code>
+    <version>1.0</version>
+    <author>Divido</author>
+    <link>http://www.divido.com</link>
+    <file path="admin/view/template/catalog/product_form.tpl">
+        <operation>
+            <search><![CDATA[
+            <li><a href="#tab-design" data-toggle="tab"><?php echo $tab_design; ?></a></li>
+            ]]></search>
+            <add position="after"><![CDATA[
+            <li><a href="#tab-divido" data-toggle="tab">Divido</a></li>
+            ]]></add>
+        </operation>
+        <operation>
+            <search><![CDATA[
+				<div class="tab-pane" id="tab-design">
+            ]]></search>
+            <add position="before"><![CDATA[
+                <div class="tab-pane" id="tab-divido">
+					Divi5o Baby
+                </div>
+            ]]></add>
+        </operation>
+    </file>  
+</modification>
+
