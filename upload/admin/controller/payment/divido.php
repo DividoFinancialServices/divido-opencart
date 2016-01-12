@@ -4,8 +4,6 @@ require_once DIR_SYSTEM . '/library/divido/Divido.php';
 
 class ControllerPaymentDivido extends Controller
 {
-    const CACHE_KEY_PLANS = 'divido_plans';
-
     private $tpldata = [];
 
     public function __construct ($registry)
@@ -16,6 +14,7 @@ class ControllerPaymentDivido extends Controller
         $this->document->setTitle($this->language->get('heading_title'));
 		$this->load->model('setting/setting');
 		$this->load->model('localisation/order_status');
+        $this->load->model('payment/divido');
 
         $this->setStrings();
         $this->setBreadcrumbs();
@@ -25,15 +24,11 @@ class ControllerPaymentDivido extends Controller
 		$this->tpldata['header']      = $this->load->controller('common/header');
 		$this->tpldata['footer']      = $this->load->controller('common/footer');
 		$this->tpldata['column_left'] = $this->load->controller('common/column_left');
-        $this->api_key = $this->getVal('divido_api_key');
-        if ($this->api_key) {
-            Divido::setMerchant($this->api_key);
-        }
-
     }
 
     public function index ()
     {
+        xdebug_break();
 		if ($this->request->server['REQUEST_METHOD'] == 'POST' && $this->validate()) {
 			$this->model_setting_setting->editSetting('divido', $this->request->post);
 			$this->session->data['success'] = $this->language->get('text_success');
@@ -50,7 +45,7 @@ class ControllerPaymentDivido extends Controller
 
     protected function setData ()
     {
-        $this->tpldata['divido_api_key']          = $this->api_key;
+        $this->tpldata['divido_api_key']          = $this->getVal('divido_api_key');
         $this->tpldata['divido_order_status_id']  = $this->getVal('divido_order_status_id');
         $this->tpldata['divido_status']           = $this->getVal('divido_status');
         $this->tpldata['divido_sort_order']       = $this->getVal('divido_sort_order');
@@ -62,7 +57,7 @@ class ControllerPaymentDivido extends Controller
         $this->tpldata['divido_price_threshold']  = $this->getVal('divido_price_threshold');
         $this->tpldata['divido_planselection']    = $this->getVal('divido_planselection');
         $this->tpldata['divido_plans_selected']   = $this->getVal('divido_plans_selected') ?: array();
-        $this->tpldata['divido_plans']            = $this->getPlans();
+        $this->tpldata['divido_plans']            = $this->model_payment_divido->getAllPlans();
     }
 
     protected function getPlans ()
