@@ -1,10 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <modification>
     <name>Divido Product Tab</name>
-	<code>00005</code>
+	<code>199</code>
     <version>1.0</version>
     <author>Divido</author>
     <link>http://www.divido.com</link>
+    <file path="admin/controller/catalog/product.php">
+        <operation>
+            <search><![CDATA[
+            $this->model_catalog_product->editProduct($this->request->get['product_id'], $this->request->post);
+            ]]></search>
+            <add position="after"><![CDATA[
+                xdebug_break();
+            $this->load->model('payment/divido');
+            $this->model_payment_divido->editSettings($this->request->get['product_id'], $this->request->post);
+            ]]></add>
+        </operation>
+        <operation>
+            <search><![CDATA[
+            $this->response->setOutput($this->load->view('catalog/product_form.tpl', $data));
+            ]]></search>
+            <add position="before"><![CDATA[
+            // Divido
+            $this->load->model('payment/divido');
+            xdebug_Break();
+
+            $divido_settings = $this->model_payment_divido->getSettings($this->request->get['product_id']);
+
+            $divido_display = 'default';
+		    if (isset($this->request->post['divido_display'])) {
+                $divido_display = $this->request->post['divido_display'];
+            } elseif (! empty($divido_settings['display'])) {
+                $divido_display = $divido_settings['display'];
+            }
+
+            $divido_plans = array();
+		    if (! empty($this->request->post['divido_plans'])) {
+                $divido_plans = $this->request->post['divido_plans'];
+            } elseif (! empty($divido_settings['plans'])) {
+                $divido_plans = explode(',', $divido_settings['plans']);
+            }
+
+            $data['divido_global_plans'] = $this->model_payment_divido->getGlobalSelectedPlans();
+            $data['divido_plans']        = $divido_plans;
+            $data['divido_display']      = $divido_display;
+            ]]></add>
+        </operation>
+    </file>
     <file path="admin/view/template/catalog/product_form.tpl">
         <operation>
             <search><![CDATA[
@@ -14,13 +56,43 @@
             <li><a href="#tab-divido" data-toggle="tab">Divido</a></li>
             ]]></add>
         </operation>
+
         <operation>
             <search><![CDATA[
 				<div class="tab-pane" id="tab-design">
             ]]></search>
             <add position="before"><![CDATA[
                 <div class="tab-pane" id="tab-divido">
-					Divi5o Baby
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Available on finance</label>
+                        <div class="col-sm-10">
+                            <div>
+                                <label class="radio-inline">
+                                    <input type="radio" name="divido_display" value="default" <?php if ($divido_display != 'custom') { ?>checked<?php } ?>>
+                                    Default settings
+                                </label>
+                            </div>
+                            <div>
+                                <label class="radio-inline">
+                                    <input type="radio" name="divido_display" value="custom" <?php if ($divido_display == 'custom') { ?>checked<?php } ?>>
+                                    Selected plans
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Selected plans</label>
+                        <div class="col-sm-10">
+                            <?php foreach ($divido_global_plans as $global_plan): ?>
+                            <div>
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" name="divido_plans[]" value="<?php echo $global_plan->id; ?>" <?php if (in_array($global_plan->id, $divido_plans)) echo "checked"; ?>>
+                                    <?php echo "{$global_plan->text} ({$global_plan->interest_rate}% APR)"; ?>
+                                </label>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
                 </div>
             ]]></add>
         </operation>
