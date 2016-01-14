@@ -28,7 +28,6 @@ class ControllerPaymentDivido extends Controller
 
     public function index ()
     {
-        xdebug_break();
 		if ($this->request->server['REQUEST_METHOD'] == 'POST' && $this->validate()) {
 			$this->model_setting_setting->editSetting('divido', $this->request->post);
 			$this->session->data['success'] = $this->language->get('text_success');
@@ -57,7 +56,13 @@ class ControllerPaymentDivido extends Controller
         $this->tpldata['divido_price_threshold']  = $this->getVal('divido_price_threshold');
         $this->tpldata['divido_planselection']    = $this->getVal('divido_planselection');
         $this->tpldata['divido_plans_selected']   = $this->getVal('divido_plans_selected') ?: array();
-        $this->tpldata['divido_plans']            = $this->model_payment_divido->getAllPlans();
+
+        try {
+            $this->tpldata['divido_plans'] = $this->model_payment_divido->getAllPlans();
+        } catch (Exception $e) {
+            $this->log->write($e->getMessage());
+            $this->tpldata['divido_plans'] = array();
+        }
     }
 
     protected function getPlans ()
