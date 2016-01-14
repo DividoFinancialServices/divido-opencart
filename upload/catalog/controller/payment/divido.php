@@ -182,7 +182,7 @@ class ControllerPaymentDivido extends Controller
         if (isset($this->request->server['HTTPS']) && (($this->request->server['HTTPS'] == 'on') || ($this->request->server['HTTPS'] == '1'))) {
             $shop_url = $this->config->get('config_ssl');
         }
-        $callback_url = $shop_url . 'divido_callback.php';
+        $callback_url = $shop_url . 'index.php?route=payment/divido/update';
         $return_url   = $shop_url . 'index.php?route=account/order';
 
         $request_data = array(
