@@ -113,7 +113,7 @@
                         </div>
                     </div>
 
-                    <div class="form-group">
+                    <div id="threshold" class="form-group">
                         <label class="col-sm-2 control-label" for="divido_price_threshold"><?php echo $entry_price_threshold; ?></label>
                         <div class="col-sm-10">
                             <input type="text" name="divido_price_threshold" value="<?php echo $divido_price_threshold; ?>" class="form-control" id="divido_price_threshold">
@@ -131,7 +131,7 @@
                         </div>
                     </div>
 
-                    <div class="form-group">
+                    <div id="plan-list" class="form-group">
                         <label class="col-sm-2 control-label"><?php echo $entry_planlist; ?></label>
                         <div class="col-sm-10">
                             <?php foreach ($divido_plans as $plan): $checked = in_array($plan->id, $divido_plans_selected) ? 'checked' : null; ?>
@@ -152,22 +152,44 @@
 (function($) {
     var divido = {
         initialize: function () {
-
+            this.bindEvents();
+            this.toggleFields();
         },
 
         bindEvents: function () {
+            $('#divido_productselection').on('change', this.toggleFields);
+            $('#divido_planselection').on('change', this.toggleFields);
+
         },
 
         toggleFields: function () {
             var $apiKeyField = $('#api_key');
 
-            if ($apiKeyField.val().length > 0) {
+            if ($apiKeyField.val().length < 1) {
+                $apiKeyField.closest('.form-group').siblings().hide();
+            }
+
+            var productSelection = $('#divido_productselection').val();
+            var $threshold       = $('#threshold');
+            if (productSelection == 'threshold') {
+                $threshold.show();
+            } else {
+                $threshold.hide();
+            }
+
+            var planSelection = $('#divido_planselection').val();
+            var $planList     = $('#plan-list');
+            if (planSelection == 'selected') {
+                $planList.show();
+            } else {
+                $planList.hide();
             }
         }
-    }
-    if ($('#api_key').val() == '') {
-        $('tr.divido-hidden').hide();
-    }
+    };
+
+    $(function () {
+        divido.initialize();
+    });
 
 })(jQuery);
 </script>
