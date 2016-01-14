@@ -39,44 +39,47 @@
         <input type="button" value="<?php echo $button_confirm; ?>" id="button-confirm" class="btn btn-primary" data-loading-text="<?php echo $text_loading; ?>" />
     </div>
 </div>
-<script type="text/javascript"><!--
-$('#button-confirm').on('click', function() {
-    var finance_elem = $('select[name="divido_finance"]');
-    var deposit      = $('input[name="divido_deposit"]').val();
+<script>
+(function($) {
+    $(function () {
+        $('#button-confirm').on('click', function() {
+            var finance_elem = $('select[name="divido_finance"]');
+            var deposit      = $('input[name="divido_deposit"]').val();
 
-    var finance;
-    if (finance_elem.length > 0) {
-        finance = finance_elem.val();
-    } else {
-        finance = $('[data-divido-calculator]').data('divido-plans');
-    }
-
-    var data = {
-        finance: finance,
-        deposit: deposit
-    };
-    console.log(data);
-	$.ajax({
-		type     : 'post',
-		url      : 'index.php?route=payment/divido/confirm',
-        data     : data,
-        dataType : 'json',
-		cache    : false,
-		beforeSend: function() {
-			$('#button-confirm').button('loading');
-		},
-		complete: function() {
-			$('#button-confirm').button('reset');
-		},
-		success: function(data) {
-            if (data.status == 'ok') {
-                location = data.url;
+            var finance;
+            if (finance_elem.length > 0) {
+                finance = finance_elem.val();
             } else {
-                message = data.message || '<?php echo $generic_credit_req_error; ?>';
-                $('#divido-checkout')
-                    .prepend('<div class="alert alert-warning">' + message + '<button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+                finance = $('[data-divido-calculator]').data('divido-plans');
             }
-		}
-	});
-});
-//--></script>
+
+            var data = {
+                finance: finance,
+                deposit: deposit
+            };
+
+            $.ajax({
+                type     : 'post',
+                url      : 'index.php?route=payment/divido/confirm',
+                data     : data,
+                dataType : 'json',
+                cache    : false,
+                beforeSend: function() {
+                    $('#button-confirm').button('loading');
+                },
+                complete: function() {
+                    $('#button-confirm').button('reset');
+                },
+                success: function(data) {
+                    if (data.status == 'ok') {
+                        location = data.url;
+                    } else {
+                        message = data.message || '<?php echo $generic_credit_req_error; ?>';
+                        $('#divido-checkout').prepend('<div class="alert alert-warning">' + message + '<button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+                    }
+                }
+            });
+        });
+    });
+})(jQuery);
+</script>
