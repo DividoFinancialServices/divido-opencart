@@ -1,7 +1,30 @@
 <?php
 class ControllerPaymentDivido extends Controller
 {
-    const TPL = '/template/payment/divido.tpl';
+    const 
+        TPL                 = '/template/payment/divido.tpl',
+    
+        STATUS_ACCEPTED     = 'ACCEPTED',
+        STATUS_DEPOSIT_PAID = 'DEPOSIT_PAID',
+        STATUS_DEFERRED     = 'DEFERRED',
+        STATUS_SIGNED       = 'SIGNED',
+        STATUS_FULLFILLED   = 'FULLFILLED';
+
+    private $status_id = array(
+        self::STATUS_ACCEPTED     => 1,
+        self::STATUS_DEPOSIT_PAID => 1,
+        self::STATUS_DEFERRED     => 1,
+        self::STATUS_SIGNED       => 1,
+        self::STATUS_FULLFILLED   => 5,
+    );
+
+    private $history_messages = array(
+        self::STATUS_ACCEPTED     => 'Credit request accepted',
+        self::STATUS_DEPOSIT_PAID => 'Deposit paid',
+        self::STATUS_DEFERRED     => 'Credit request deferred',
+        self::STATUS_SIGNED       => 'Contract signed',
+        self::STATUS_FULLFILLED   => 'Credit request fullfilled',
+    );
 
     public function index ()
     {
@@ -76,6 +99,23 @@ class ControllerPaymentDivido extends Controller
         }
 
         return array($total, $totals);
+    }
+
+    public function update ()
+    {
+        $this->load->model('checkout/order');
+
+        $input = file_get_contents('php://input');
+        $data  = json_decode($input);
+
+        $order_id  = $data->metadata->order_id;
+        $status_id = $this->status_id[$data->status];
+        $message   = $this->history_messages[$data->status];
+        $notify    = $data->status == self::STATUS_FULLFILLED;
+    
+        $this->model_checkout_order->addOrderHistory($order_id, $status_id, $message, $notify);
+
+        $this->response->setOutput('ok');
     }
 
     public function confirm () 
