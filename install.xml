@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <modification>
     <name>Divido Product Tab</name>
-	<code>206</code>
+	<code>209</code>
     <version>1.0</version>
     <author>Divido</author>
     <link>http://www.divido.com</link>
@@ -124,5 +124,29 @@
             ]]></add>
         </operation>
     </file>  
-</modification>
+    <file path="catalog/controller/product/product.php">
+        <operation>
+            <search><![CDATA[
+			    $data['column_left'] = $this->load->controller('common/column_left');
+            ]]></search>
+            <add position="before"><![CDATA[
+                if ($this->config->get('divido_calc_layout') == 'default') {
+                    $this->document->addStyle('catalog/view/theme/default/stylesheet/divido.css');
+                }
+                $price = 0;
+                if (($this->config->get('config_customer_price') && $this->customer->isLogged()) || !$this->config->get('config_customer_price')) {
+                    $price = $this->tax->calculate($product_info['price'], $product_info['tax_class_id'], $this->config->get('config_tax'));
+                } 
 
+                $calc_parameters = array(
+                    'product_id' => $product_id, 
+                    'price' => $price,
+                    'type' => 'full',
+                );
+                $data['divido_calc']   = $this->load->controller('payment/divido/calculator', $calc_parameters);
+                $calc_parameters['type'] = 'minimal';
+                $data['divido_widget'] = $this->load->controller('payment/divido/calculator', $calc_parameters);
+            ]]></add>
+        </operation>
+    </file>
+</modification>

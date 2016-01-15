@@ -3,6 +3,8 @@ class ControllerPaymentDivido extends Controller
 {
     const 
         TPL                 = '/template/payment/divido.tpl',
+        TPL_WIDGET          = '/template/payment/divido_widget.tpl',
+        TPL_CALCULATOR      = '/template/payment/divido_calculator.tpl',
     
         STATUS_ACCEPTED     = 'ACCEPTED',
         STATUS_DEPOSIT_PAID = 'DEPOSIT_PAID',
@@ -26,22 +28,23 @@ class ControllerPaymentDivido extends Controller
         self::STATUS_FULLFILLED   => 'Credit request fullfilled',
     );
 
-    public function index ()
+    public function __construct ($registry)
     {
+        parent::__construct($registry);
+
         $this->load->model('payment/divido');
         $this->load->language('payment/divido');
+    }
+    
+
+    public function index ()
+    {
 
         $api_key   = $this->config->get('divido_api_key');
         $key_parts = explode('.', $api_key);
         $js_key    = strtolower(array_shift($key_parts));
 
-        $available_plans = $this->model_payment_divido->getGlobalSelectedPlans();
-
-        $plans = array();
-        foreach ($available_plans as $plan) {
-            $plans[] = $plan->id;
-        }
-
+        $plans     = $this->getPlanIds();
         $plan_list = implode(',', $plans);
 
         list($total, $totals) = $this->getTotals();
@@ -68,7 +71,6 @@ class ControllerPaymentDivido extends Controller
 
         $default_tpl  = 'default' . self::TPL;
         $override_tpl = $this->config->get('config_template') . self::TPL;
-
 		if (file_exists(DIR_TEMPLATE . $override_tpl)) {
 			return $this->load->view($override_tpl, $data);
 		}
@@ -76,6 +78,47 @@ class ControllerPaymentDivido extends Controller
         return $this->load->view($default_tpl, $data);
     }
 
+    private function getPlanIds ()
+    {
+        
+        $available_plans = $this->model_payment_divido->getGlobalSelectedPlans();
+
+        $plans = array();
+        foreach ($available_plans as $plan) {
+            $plans[] = $plan->id;
+        }
+
+        return $plans;
+    }
+
+    private function getProductPlanIds ($product_id)
+    {
+        $settings = $this->model_payment_divido->getProductSettings($product_id);
+
+        if ($settings['display'] == 'custom' && empty($settings['plans'])) {
+            return null;
+        }
+
+        $default_plans = $this->getPlanIds();
+        $selected_plans = explode(',', $settings['plans']);
+
+        if ($settings['display'] == 'default') {
+            return $default_plans;
+        }
+
+        $plans = array();
+        foreach ($default_plans as $plan) {
+            if (in_array($plan, $selected_plans)) {
+                $plans[] = $plan;
+            }
+        }
+
+        if (empty($plans)) {
+            return null;
+        }
+
+        return $plans;
+    }
     public function getTotals ()
     {
         $this->load->model('extension/extension');
@@ -227,4 +270,36 @@ class ControllerPaymentDivido extends Controller
 
         $this->response->setOutput(json_encode($data));
 	}
+    public function calculator ($args)
+    {
+        if (! $this->model_payment_divido->isEnabled()) {
+            return null;
+        }
+        
+        $product_id    = $args['product_id'];
+        $product_price = $args['price'];
+        $type          = $args['type'];
+        $plans         = $this->getProductPlanIds($product_id);
+
+        $plan_list     = implode(',', $plans);
+
+        if (empty($plan_list)) {
+            return null;
+        }
+
+        $data = array(
+            'planList'     => $plan_list,
+            'productPrice' => $product_price,
+        );
+
+        $filename = $type == 'full' ? self::TPL_CALCULATOR : self::TPL_WIDGET;
+
+        $default_tpl  = 'default' . $filename;
+        $override_tpl = $this->config->get('config_template') . $filename;
+		if (file_exists(DIR_TEMPLATE . $override_tpl)) {
+			return $this->load->view($override_tpl, $data);
+        }
+
+        return $this->load->view($default_tpl);
+    }
 }

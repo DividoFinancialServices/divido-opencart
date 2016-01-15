@@ -38,6 +38,30 @@ class ModelPaymentDivido extends Model
         return $method_data;
     }
 
+    public function getProductSettings ($product_id)
+    {
+        $query = sprintf("
+            select display, plans
+            from %sproduct_divido
+            where product_id = %s
+            ", 
+            DB_PREFIX,
+            $this->db->escape($product_id)
+        );
+
+        $result = $this->db->query($query);
+
+        return $result->row;
+    }
+
+    public function isEnabled ()
+    {
+        $api_key = $this->config->get('divido_api_key');
+        $enabled = $this->config->get('divido_status');
+
+        return !empty($api_key) && $enabled == 1;
+    }
+
     public function getGlobalSelectedPlans ()
     {
         $all_plans     = $this->getAllPlans();
