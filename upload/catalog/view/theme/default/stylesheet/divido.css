@@ -20,6 +20,11 @@
 	margin:0px;
 }
 
+.divido-calculator h1 {
+    color: white;
+}
+
+
 .divido-calculator dl {
 	width: 100%;
 	overflow: hidden;

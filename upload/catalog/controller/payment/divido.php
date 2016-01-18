@@ -94,8 +94,16 @@ class ControllerPaymentDivido extends Controller
     private function getProductPlanIds ($product_id)
     {
         $settings = $this->model_payment_divido->getProductSettings($product_id);
+        $product_selection = $this->config->get('divido_productselection');
 
-        if ($settings['display'] == 'custom' && empty($settings['plans'])) {
+        if (empty($settings)) {
+            $settings = array(
+                'display' => 'default',
+                'plans'   => '',
+            );
+        }
+
+        if ($product_selection == 'selected' && $settings['display'] == 'custom' && empty($settings['plans'])) {
             return null;
         }
 
@@ -275,17 +283,24 @@ class ControllerPaymentDivido extends Controller
         if (! $this->model_payment_divido->isEnabled()) {
             return null;
         }
-        
-        $product_id    = $args['product_id'];
-        $product_price = $args['price'];
-        $type          = $args['type'];
-        $plans         = $this->getProductPlanIds($product_id);
 
-        $plan_list     = implode(',', $plans);
+        $product_selection = $this->config->get('divido_productselection');
+        $price_threshold   = $this->config->get('divido_price_threshold');
+        $product_id        = $args['product_id'];
+        $product_price     = $args['price'];
+        $type              = $args['type'];
 
-        if (empty($plan_list)) {
+        if ($product_selection == 'threshold' && $product_price < $price_threshold) {
             return null;
         }
+
+        $plans = $this->getProductPlanIds($product_id);
+
+        if (empty($plans)) {
+            return null;
+        }
+
+        $plan_list     = implode(',', $plans);
 
         $data = array(
             'planList'     => $plan_list,

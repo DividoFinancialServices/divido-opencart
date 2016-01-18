@@ -1,7 +1,7 @@
 <div class="divido-calculator divido-theme-blue" data-divido-calculator data-divido-plans="<?php echo $planList; ?>" data-divido-amount="<?php echo $productPrice; ?>">
     <h1>
         <a href="https://www.divido.com" target="_blank" class="divido-logo divido-logo-sm" style="float:right;">Divido</a>
-        Pay in instalments
+        Pay in installments
     </h1>
     <dl>
         <dt><span data-divido-choose-finance data-divido-label="Choose your plan" data-divido-form="finance"></span></dt>

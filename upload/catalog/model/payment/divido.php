@@ -67,7 +67,7 @@ class ModelPaymentDivido extends Model
         $all_plans     = $this->getAllPlans();
         $display_plans = $this->config->get('divido_planselection');
 
-        if ($display_plans == 'default' || empty($display_plans)) {
+        if ($display_plans == 'all' || empty($display_plans)) {
             return $all_plans;
         }
         
