@@ -7,17 +7,17 @@ class ControllerPaymentDivido extends Controller
         TPL_CALCULATOR      = '/template/payment/divido_calculator.tpl',
     
         STATUS_ACCEPTED     = 'ACCEPTED',
-        STATUS_DEPOSIT_PAID = 'DEPOSIT_PAID',
+        STATUS_DEPOSIT_PAID = 'DEPOSIT-PAID',
         STATUS_DEFERRED     = 'DEFERRED',
         STATUS_SIGNED       = 'SIGNED',
-        STATUS_FULLFILLED   = 'FULLFILLED';
+        STATUS_FULFILLED    = 'FULFILLED';
 
     private $status_id = array(
         self::STATUS_ACCEPTED     => 1,
         self::STATUS_DEPOSIT_PAID => 1,
         self::STATUS_DEFERRED     => 1,
         self::STATUS_SIGNED       => 1,
-        self::STATUS_FULLFILLED   => 5,
+        self::STATUS_FULFILLED    => 5,
     );
 
     private $history_messages = array(
@@ -25,7 +25,7 @@ class ControllerPaymentDivido extends Controller
         self::STATUS_DEPOSIT_PAID => 'Deposit paid',
         self::STATUS_DEFERRED     => 'Credit request deferred',
         self::STATUS_SIGNED       => 'Contract signed',
-        self::STATUS_FULLFILLED   => 'Credit request fullfilled',
+        self::STATUS_FULFILLED    => 'Credit request fulfilled',
     );
 
     public function __construct ($registry)
@@ -159,10 +159,15 @@ class ControllerPaymentDivido extends Controller
         $input = file_get_contents('php://input');
         $data  = json_decode($input);
 
+        if (!isset($data->status)) {
+            $this->response->setOutput('');
+            return;
+        }
+
         $order_id  = $data->metadata->order_id;
         $status_id = $this->status_id[$data->status];
         $message   = $this->history_messages[$data->status];
-        $notify    = $data->status == self::STATUS_FULLFILLED;
+        $notify    = $data->status == self::STATUS_FULFILLED;
     
         $this->model_checkout_order->addOrderHistory($order_id, $status_id, $message, $notify);
 

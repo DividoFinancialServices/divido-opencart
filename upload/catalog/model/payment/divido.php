@@ -13,17 +13,11 @@ class ModelPaymentDivido extends Model
         parent::__construct($registry);
 
         $this->api_key = $this->config->get('divido_api_key');
-        $sandbox = 1;
 
-        if (!$this->api_key) {
-            throw new Exception("No Divido api-key defined");
+        if ($this->api_key) {
+            Divido::setMerchant($this->api_key);
         }
 
-        Divido::setMerchant($this->api_key);
-
-        if ($sandbox) {
-            Divido::setSandboxMode(true);
-        }
     }
 
     public function getMethod ($payment_address, $total)
