@@ -1,26 +1,29 @@
+
+
 <div class="divido-calculator divido-theme-blue" data-divido-calculator data-divido-plans="<?php echo $planList; ?>" data-divido-amount="<?php echo $productPrice; ?>">
     <h1>
         <a href="https://www.divido.com" target="_blank" class="divido-logo divido-logo-sm" style="float:right;">Divido</a>
-        Pay in installments
+        <?php echo $text_checkout_title; ?> 
     </h1>
+
     <dl>
-        <dt><span data-divido-choose-finance data-divido-label="Choose your plan" data-divido-form="finance"></span></dt>
-        <dd><span class="divido-deposit" data-divido-choose-deposit data-divido-label="Choose your deposit" data-divido-form="deposit"></span></dd>
+        <dt><span data-divido-choose-finance data-divido-label="<?php echo $text_chooses_deposit; ?>" data-divido-form="finance"></span></dt>
+        <dd><span class="divido-deposit" data-divido-choose-deposit data-divido-label="<?php echo $text_chooses_deposit; ?>" data-divido-form="deposit"></span></dd>
     </dl>
-    <div class="description"><strong><span data-divido-agreement-duration></span> monthly payments of <span data-divido-monthly-instalment></span></strong></div>
+    <div class="description"><strong><span data-divido-agreement-duration></span> <?php echo $text_monthly_payments; ?> <span data-divido-monthly-instalment></span></strong></div>
     <div class="divido-info">
         <dl>
-            <dt>Term</dt>
-            <dd><span data-divido-agreement-duration></span> months</dd>
-            <dt>Monthly instalment</dt>
+            <dt><?php echo $text_term; ?></dt>
+            <dd><span data-divido-agreement-duration></span> <?php echo $text_months; ?></dd>
+            <dt><?php echo $text_monthly_installment; ?></dt>
             <dd><span data-divido-monthly-instalment></span></dd>
-            <dt>Deposit</dt>
+            <dt><?php echo $text_deposit; ?></dt>
             <dd><span data-divido-deposit></span></dd>
-            <dt>Amount of credit</dt>
-            <dd><span data-divido-credit-amount></span></dd>
-            <dt>Total payable</dt>
-            <dd><span data-divido-total-payable></span></dd>
-            <dt>Total interest APR</dt>
+            <dt><?php echo $text_credit_amount; ?></dt>
+            <dd><span data-divido-credit-amount-rounded></span></dd>
+            <dt><?php echo $text_amount_payable; ?></dt>
+            <dd><span data-divido-total-payable-rounded></span></dd>
+            <dt><?php echo $text_total_interest; ?></dt>
             <dd><span data-divido-interest-rate></span></dd>
         </dl>
     </div>

@@ -46,8 +46,7 @@ class ControllerPaymentDivido extends Controller
 
         list($total, $totals) = $this->model_payment_divido->getOrderTotals();
 
-        $plans     = $this->model_payment_divido->getCartPlans($this->cart);
-
+        $plans = $this->model_payment_divido->getCartPlans($this->cart);
         foreach ($plans as $key => $plan) {
             if ($plan->min_amount > $total) {
                 unset($plans[$key]);
@@ -64,6 +63,7 @@ class ControllerPaymentDivido extends Controller
             'text_chooses_deposit'     => $this->language->get('text_chooses_deposit'),
             'text_checkout_title'      => $this->language->get('text_checkout_title'),
             'text_monthly_payments'    => $this->language->get('text_monthly_payments'),
+            'text_months'              => $this->language->get('text_months'),
             'text_term'                => $this->language->get('text_term'),
             'text_deposit'             => $this->language->get('text_deposit'),
             'text_credit_amount'       => $this->language->get('text_credit_amount'),
@@ -236,7 +236,7 @@ class ControllerPaymentDivido extends Controller
             return null;
         }
 
-        $plans     = $this->model_payment_divido->getProductPlans($product_id);
+        $plans = $this->model_payment_divido->getProductPlans($product_id);
         if (empty($plans)) {
             return null;
         }
@@ -246,8 +246,19 @@ class ControllerPaymentDivido extends Controller
         $plan_list = implode(',', $plans_ids);
 
         $data = array(
-            'planList'     => $plan_list,
-            'productPrice' => $product_price,
+            'planList'                 => $plan_list,
+            'productPrice'             => $product_price,
+            'text_loading'             => $this->language->get('text_loading'),
+            'text_chooses_deposit'     => $this->language->get('text_chooses_deposit'),
+            'text_checkout_title'      => $this->language->get('text_checkout_title'),
+            'text_monthly_payments'    => $this->language->get('text_monthly_payments'),
+            'text_months'              => $this->language->get('text_months'),
+            'text_term'                => $this->language->get('text_term'),
+            'text_deposit'             => $this->language->get('text_deposit'),
+            'text_credit_amount'       => $this->language->get('text_credit_amount'),
+            'text_amount_payable'      => $this->language->get('text_amount_payable'),
+            'text_total_interest'      => $this->language->get('text_total_interest'),
+            'text_monthly_installment' => $this->language->get('text_monthly_installment'),
         );
 
         $filename = $type == 'full' ? self::TPL_CALCULATOR : self::TPL_WIDGET;

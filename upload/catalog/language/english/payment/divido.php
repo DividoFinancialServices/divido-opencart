@@ -2,6 +2,7 @@
 $_['text_checkout_title']      = 'Pay in instalments';
 $_['text_chooses_deposit']     = 'Choose your deposit';
 $_['text_monthly_payments']    = 'monthly payments of';
+$_['text_months']              = 'months';
 $_['text_term']                = 'Term';
 $_['text_deposit']             = 'Deposit';
 $_['text_credit_amount']       = 'Amount of credit';
