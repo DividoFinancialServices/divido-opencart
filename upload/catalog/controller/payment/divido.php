@@ -28,6 +28,7 @@ class ControllerPaymentDivido extends Controller
         self::STATUS_FULFILLED    => 'Credit request fulfilled',
     );
 
+
     public function __construct ($registry)
     {
         parent::__construct($registry);
@@ -36,7 +37,6 @@ class ControllerPaymentDivido extends Controller
         $this->load->language('payment/divido');
     }
     
-
     public function index ()
     {
 
@@ -44,10 +44,19 @@ class ControllerPaymentDivido extends Controller
         $key_parts = explode('.', $api_key);
         $js_key    = strtolower(array_shift($key_parts));
 
-        $plans     = $this->getPlanIds();
-        $plan_list = implode(',', $plans);
+        list($total, $totals) = $this->model_payment_divido->getOrderTotals();
 
-        list($total, $totals) = $this->getTotals();
+        $plans     = $this->model_payment_divido->getCartPlans($this->cart);
+
+        foreach ($plans as $key => $plan) {
+            if ($plan->min_amount > $total) {
+                unset($plans[$key]);
+            }
+        }
+
+        $plans_ids  = array_map(function ($plan) { return $plan->id; }, $plans);
+        $plans_list = implode(',', $plans_ids);
+
 
         $data = array(
             'button_confirm'           => $this->language->get('divido_checkout'),
@@ -65,7 +74,7 @@ class ControllerPaymentDivido extends Controller
 
             'merchant_script'          => "//cdn.divido.com/calculator/{$js_key}.js",
             'grand_total'              => $total,
-            'plan_list'                => $plan_list,
+            'plan_list'                => $plans_list,
             'generic_credit_req_error' => 'Credit request could not be initiated',
         );
 
@@ -76,80 +85,6 @@ class ControllerPaymentDivido extends Controller
 		}
 		
         return $this->load->view($default_tpl, $data);
-    }
-
-    private function getPlanIds ()
-    {
-        
-        $available_plans = $this->model_payment_divido->getGlobalSelectedPlans();
-
-        $plans = array();
-        foreach ($available_plans as $plan) {
-            $plans[] = $plan->id;
-        }
-
-        return $plans;
-    }
-
-    private function getProductPlanIds ($product_id)
-    {
-        $settings = $this->model_payment_divido->getProductSettings($product_id);
-        $product_selection = $this->config->get('divido_productselection');
-
-        if (empty($settings)) {
-            $settings = array(
-                'display' => 'default',
-                'plans'   => '',
-            );
-        }
-
-        if ($product_selection == 'selected' && $settings['display'] == 'custom' && empty($settings['plans'])) {
-            return null;
-        }
-
-        $default_plans = $this->getPlanIds();
-        $selected_plans = explode(',', $settings['plans']);
-
-        if ($settings['display'] == 'default') {
-            return $default_plans;
-        }
-
-        $plans = array();
-        foreach ($default_plans as $plan) {
-            if (in_array($plan, $selected_plans)) {
-                $plans[] = $plan;
-            }
-        }
-
-        if (empty($plans)) {
-            return null;
-        }
-
-        return $plans;
-    }
-    public function getTotals ()
-    {
-        $this->load->model('extension/extension');
-        $results    = $this->model_extension_extension->getExtensions('total');
-        $sort_order = array();
-        foreach ($results as $key => $value) {
-            $sort_order[$key] = $this->config->get($value['code'] . '_sort_order');
-        }
-
-        array_multisort($sort_order, SORT_ASC, $results);
-
-        $total  = 0;
-        $taxes  = $this->cart->getTaxes();
-        $totals = array();
-        foreach ($results as $result) {
-            if ($this->config->get($result['code'] . '_status')) {
-                $this->load->model('total/' . $result['code']);
-
-                $this->{'model_total_' . $result['code']}->getTotal($totals, $total, $taxes);
-            }
-        }
-
-        return array($total, $totals);
     }
 
     public function update ()
@@ -221,7 +156,7 @@ class ControllerPaymentDivido extends Controller
             );
         }
 
-        list($total, $totals) = $this->getTotals();
+        list($total, $totals) = $this->model_payment_divido->getOrderTotals();
 
         $subTotal   = $total;
         $cartTotal  = $this->cart->getSubTotal();
@@ -234,6 +169,8 @@ class ControllerPaymentDivido extends Controller
             'value'    => $shiphandle,
         );
 
+        $deposit_amount = round(($deposit / 100) * $total, 2, PHP_ROUND_HALF_UP);
+
         $shop_url = $this->config->get('config_url');
         if (isset($this->request->server['HTTPS']) && (($this->request->server['HTTPS'] == 'on') || ($this->request->server['HTTPS'] == '1'))) {
             $shop_url = $this->config->get('config_ssl');
@@ -243,7 +180,7 @@ class ControllerPaymentDivido extends Controller
 
         $request_data = array(
             'merchant' => $api_key,
-            'deposit'  => $deposit,
+            'deposit'  => $deposit_amount,
             'finance'  => $finance,
             'country'  => $country,
             'language' => $language,
@@ -299,13 +236,14 @@ class ControllerPaymentDivido extends Controller
             return null;
         }
 
-        $plans = $this->getProductPlanIds($product_id);
-
+        $plans     = $this->model_payment_divido->getProductPlans($product_id);
         if (empty($plans)) {
             return null;
         }
+        
+        $plans_ids = array_map(function ($plan) { return $plan->id; }, $plans);
 
-        $plan_list     = implode(',', $plans);
+        $plan_list = implode(',', $plans_ids);
 
         $data = array(
             'planList'     => $plan_list,

@@ -101,4 +101,111 @@ class ModelPaymentDivido extends Model
 
         return $plans;
     }
+
+    public function getCartPlans ($cart)
+    {
+        $plans    = array();
+        $products = $cart->getProducts();
+        xdebug_break();
+        foreach ($products as $product) {
+            $product_plans = $this->getProductPlans($product['product_id']);
+            if ($product_plans) {
+                $plans = array_merge($plans, $product_plans);
+            }
+        }
+
+        return $plans;
+    }
+
+    public function getPlans ($default_plans)
+    {
+        if ($default_plans) {
+            $plans = $this->getGlobalSelectedPlans();
+        } else {
+            $plans = $this->getAllPlans();
+        }
+
+        return $plans;
+    }
+
+    public function getOrderTotals ()
+    {
+        $this->load->model('extension/extension');
+        $results    = $this->model_extension_extension->getExtensions('total');
+        $sort_order = array();
+        foreach ($results as $key => $value) {
+            $sort_order[$key] = $this->config->get($value['code'] . '_sort_order');
+        }
+
+        array_multisort($sort_order, SORT_ASC, $results);
+
+        $total  = 0;
+        $taxes  = $this->cart->getTaxes();
+        $totals = array();
+        foreach ($results as $result) {
+            if ($this->config->get($result['code'] . '_status')) {
+                $this->load->model('total/' . $result['code']);
+                $this->{'model_total_' . $result['code']}->getTotal($totals, $total, $taxes);
+            }
+        }
+
+        return array($total, $totals);
+    }
+
+    public function getProductPlans ($product_id)
+    {
+        $settings          = $this->getProductSettings($product_id);
+        $product_selection = $this->config->get('divido_productselection');
+
+        if (empty($settings)) {
+            $settings = array(
+                'display' => 'default',
+                'plans'   => '',
+            );
+        }
+
+        if ($product_selection == 'selected' && $settings['display'] == 'custom' && empty($settings['plans'])) {
+            return null;
+        }
+
+        if ($settings['display'] == 'default') {
+            $plans = $this->getPlans(true);
+            return $plans;
+        }
+
+        // If the product has non-default plans, fetch all of them.
+        $available_plans = $this->getPlans(false);
+        $selected_plans  = explode(',', $settings['plans']);
+
+        $plans = array();
+        foreach ($available_plans as $plan) {
+            if (in_array($plan->id, $selected_plans)) {
+                $plans[] = $plan;
+            }
+        }
+
+        if (empty($plans)) {
+            return null;
+        }
+
+        return $plans;
+    }
+
+    public function isApplicable ()
+    {
+        $country = $this->session->data['payment_address']['iso_code_2'];
+        if ($country != 'GB') {
+            return false;
+        }
+
+        $plans          = $this->model_payment_divido->getCartPlans($this->cart);
+        list($subtotal) = $this->getOrderTotals();
+        foreach ($plans as $plan) {
+            if ($plan->min_amount <= $subtotal) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
