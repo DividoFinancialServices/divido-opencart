@@ -1,5 +1,5 @@
 <?php
-$_['text_checkout_title']      = 'Pay in installments';
+$_['text_checkout_title']      = 'Pay in instalments';
 $_['text_chooses_deposit']     = 'Choose your deposit';
 $_['text_monthly_payments']    = 'monthly payments of';
 $_['text_term']                = 'Term';
