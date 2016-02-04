@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <modification>
     <name>Divido Product Tab</name>
-	<code>216</code>
+	<code>228</code>
     <version>1.0</version>
     <author>Divido</author>
     <link>http://www.divido.com</link>
@@ -39,9 +39,25 @@
                 $divido_plans = explode(',', $divido_settings['plans']);
             }
 
-            $data['divido_global_plans'] = $this->model_payment_divido->getGlobalSelectedPlans();
-            $data['divido_plans']        = $divido_plans;
-            $data['divido_display']      = $divido_display;
+            try {
+                $data['divido_all_plans'] = $this->model_payment_divido->getAllPlans();
+            } catch (Exception $e) {
+                $data['divido_all_plans'] = array();
+            }
+            $data['divido_plans']     = $divido_plans;
+            $data['divido_display']   = $divido_display;
+            ]]></add>
+        </operation>
+    </file>
+    <file path="catalog/controller/checkout/payment_method.php">
+        <operation>
+            <search><![CDATA[
+            if ($method) {
+            ]]></search>
+            <add position="after"><![CDATA[
+			if (method_exists($this->{'model_payment_' . $result['code']}, 'isApplicable') && ! $this->{'model_payment_' . $result['code']}->isApplicable()) {
+                continue; 
+            }
             ]]></add>
         </operation>
     </file>
@@ -81,11 +97,11 @@
                     <div id="divido-plans" class="form-group">
                         <label class="col-sm-2 control-label">Selected plans</label>
                         <div class="col-sm-10">
-                            <?php foreach ($divido_global_plans as $global_plan): ?>
+                            <?php foreach ($divido_all_plans as $plan): ?>
                             <div>
                                 <label class="checkbox-inline">
-                                    <input type="checkbox" name="divido_plans[]" value="<?php echo $global_plan->id; ?>" <?php if (in_array($global_plan->id, $divido_plans)) echo "checked"; ?>>
-                                    <?php echo "{$global_plan->text} ({$global_plan->interest_rate}% APR)"; ?>
+                                    <input type="checkbox" name="divido_plans[]" value="<?php echo $plan->id; ?>" <?php if (in_array($plan->id, $divido_plans)) echo "checked"; ?>>
+                                    <?php echo "{$plan->text} ({$plan->interest_rate}% APR)"; ?>
                                 </label>
                             </div>
                             <?php endforeach; ?>
@@ -145,8 +161,8 @@
 
                 $calc_parameters = array(
                     'product_id' => $product_id, 
-                    'price' => $price,
-                    'type' => 'full',
+                    'price'      => $price,
+                    'type'       => 'full',
                 );
                 $data['divido_calc']   = $this->load->controller('payment/divido/calculator', $calc_parameters);
                 $calc_parameters['type'] = 'minimal';
