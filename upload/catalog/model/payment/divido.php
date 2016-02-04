@@ -106,7 +106,6 @@ class ModelPaymentDivido extends Model
     {
         $plans    = array();
         $products = $cart->getProducts();
-        xdebug_break();
         foreach ($products as $product) {
             $product_plans = $this->getProductPlans($product['product_id']);
             if ($product_plans) {
