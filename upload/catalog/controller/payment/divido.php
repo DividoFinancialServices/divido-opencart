@@ -54,6 +54,7 @@ class ControllerPaymentDivido extends Controller
         }
 
         $plans_ids  = array_map(function ($plan) { return $plan->id; }, $plans);
+        $plans_ids  = array_unique($plans_ids);
         $plans_list = implode(',', $plans_ids);
 
 
