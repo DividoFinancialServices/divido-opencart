@@ -65,28 +65,6 @@ class ControllerPaymentDivido extends Controller
         }
     }
 
-    protected function getPlans ()
-    {
-        if (! $this->api_key) {
-            return null;
-        }
-
-        if ($plans = $this->cache->get(self::CACHE_KEY_PLANS)) {
-            return $plans;
-        }
-
-        $response = Divido_Finances::all();
-        if ($response->status != 'ok') {
-            $this->error['warning'] = "Can't get list of finance plans from Divido!";
-            return null;
-        }
-
-        $plans = $response->finances;
-        $this->cache->set(self::CACHE_KEY_PLANS, $plans);
-
-        return $plans;
-    }
-
     protected function setBreadcrumbs ()
     {
         $this->tpldata['breadcrumbs'] = array(
