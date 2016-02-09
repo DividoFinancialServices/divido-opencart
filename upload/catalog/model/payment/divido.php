@@ -1,5 +1,6 @@
 <?php
 
+
 require_once DIR_SYSTEM . '/library/divido/Divido.php';
 
 class ModelPaymentDivido extends Model
@@ -66,6 +67,9 @@ class ModelPaymentDivido extends Model
         }
         
         $selected_plans = $this->config->get('divido_plans_selected');
+        if (! $selected_plans) {
+            return array();
+        }
 
         $plans = array();
         foreach ($all_plans as $plan) {
