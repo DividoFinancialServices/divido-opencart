@@ -22,8 +22,14 @@
 
 .divido-calculator h1 {
     color: white;
+    font-size: 24px;
 }
 
+@media screen and (min-width: 550px) {
+    .divido-calculator h1 {
+        font-size: 33px;
+    }
+}
 
 .divido-calculator dl {
 	width: 100%;
@@ -33,29 +39,70 @@
 }
 
 .divido-calculator dt,.divido-calculator dd {
-	width: 50%;
 	float: left;
 	padding: 2px 0px;
 	margin: 0
 }
 
-@media screen and (min-width: 960px) {
 
+.divido-calculator > dl > dt, .divido-calculator > dl > dd {
+    min-width: 150px;
+}
+
+.divido-calculator > dl > dt, .divido-calculator > dl > dd {
+    width: 100%;
+}
+
+.divido-calculator > dl > dt {
+    margin-bottom: 20px;
+}
+
+@media screen and (min-width: 960px) {
+    .divido-calculator > dl > dt, .divido-calculator > dl > dd {
+        width: 50%;
+    }
+
+    .divido-calculator > dl > dt {
+        margin-bottom: auto;
+    }
+}
+
+.divido-calculator div.divido-info dl dt, .divido-calculator div.divido-info dl dd {
+    width: 100%;
+}
+.divido-calculator div.divido-info dl dd {
+    padding-left: 5px;
+}
+@media screen and (min-width: 350px) {
+    .divido-calculator div.divido-info dl dt {
+        width: 70%;
+    }
+    .divido-calculator div.divido-info dl dd {
+        width: 30%;
+    }
+}
+@media screen and (min-width: 450px) {
+    .divido-calculator div.divido-info dl dt, .divido-calculator div.divido-info dl dd {
+        width: 50%;
+    }
+}
+@media screen and (min-width: 550px) {
+    .divido-calculator div.divido-info dl dt {
+        width: 40%;
+    }
+    .divido-calculator div.divido-info dl dd {
+        width: 60%;
+    }
+}
+
+@media screen and (min-width: 1080px) {
 	.divido-calculator div.divido-info dl dt {
 		width: 30%;
-
 	}
 	.divido-calculator div.divido-info dl dd {
 		width: 70%;
 	}
-	
 }
-@media screen and (max-width: 960px) {
-	.divido-calculator div.divido-info dl dt,.divido-calculator div.divido-info dl dd {
-		width:50%;
-	}
-}
-
 
 .divido-calculator input[type=range]{
 	-webkit-appearance: none;
@@ -65,9 +112,27 @@
 	padding:0px;
 }
 
+@media screen and (min-width: 450px) {
+    .divido-calculator input[type=range]{
+	    width:85%;
+    }
+}
+
+@media screen and (min-width: 550px) {
+    .divido-calculator input[type=range]{
+	    width:90%;
+    }
+}
+
 .divido-calculator select {
 	text-transform: none;
-	width:80%;
+	width: 100%;
+}
+
+@media screen and (min-width: 960px) {
+    .divido-calculator select {
+        width: 80%;
+    }
 }
 
 .divido-calculator div.description {
