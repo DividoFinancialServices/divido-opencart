@@ -7,8 +7,8 @@
     </h1>
 
     <dl>
-        <dt><span data-divido-choose-finance data-divido-label="<?php echo $text_chooses_deposit; ?>" data-divido-form="finance"></span></dt>
-        <dd><span class="divido-deposit" data-divido-choose-deposit data-divido-label="<?php echo $text_chooses_deposit; ?>" data-divido-form="deposit"></span></dd>
+        <dt><span data-divido-choose-finance data-divido-label="<?php echo $text_choose_plan; ?>" data-divido-form="finance"></span></dt>
+        <dd><span class="divido-deposit" data-divido-choose-deposit data-divido-label="<?php echo $text_choose_deposit; ?>" data-divido-form="deposit"></span></dd>
     </dl>
     <div class="description"><strong><span data-divido-agreement-duration></span> <?php echo $text_monthly_payments; ?> <span data-divido-monthly-instalment></span></strong></div>
     <div class="divido-info">
