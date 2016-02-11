@@ -272,6 +272,6 @@ class ControllerPaymentDivido extends Controller
             $tpl = $override_tpl;
         }
 
-		return $this->load->view($override_tpl, $data);
+		return $this->load->view($tpl, $data);
     }
 }
