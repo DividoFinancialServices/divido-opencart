@@ -266,12 +266,12 @@ class ControllerPaymentDivido extends Controller
 
         $filename = $type == 'full' ? self::TPL_CALCULATOR : self::TPL_WIDGET;
 
-        $default_tpl  = 'default' . $filename;
+        $tpl  = 'default' . $filename;
         $override_tpl = $this->config->get('config_template') . $filename;
 		if (file_exists(DIR_TEMPLATE . $override_tpl)) {
-			return $this->load->view($override_tpl, $data);
+            $tpl = $override_tpl;
         }
 
-        return $this->load->view($default_tpl);
+		return $this->load->view($override_tpl, $data);
     }
 }
