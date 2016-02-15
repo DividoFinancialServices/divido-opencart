@@ -55,7 +55,7 @@ class ControllerPaymentDivido extends Controller
 		$this->tpldata['divido_productselection'] = $this->getVal('divido_productselection');
 		$this->tpldata['divido_price_threshold']  = $this->getVal('divido_price_threshold');
 		$this->tpldata['divido_planselection']    = $this->getVal('divido_planselection');
-		$this->tpldata['divido_plans_selected']   = $this->getVal('divido_plans_selected') ?: array();
+		$this->tpldata['divido_plans_selected']   = $this->getVal('divido_plans_selected') ? : array();
 
 		try {
 			$this->tpldata['divido_plans'] = $this->model_payment_divido->getAllPlans();
@@ -75,7 +75,7 @@ class ControllerPaymentDivido extends Controller
 			),
 			array(
 				'text'      => $this->language->get('text_payment'),
-				'href'      => $this->url->link('extension/payment', 'token=' . $this->session->data['token'], 'SSL'),       		
+				'href'      => $this->url->link('extension/payment', 'token=' . $this->session->data['token'], 'SSL'),
 				'separator' => ' :: '
 			),
 			array(

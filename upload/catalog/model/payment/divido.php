@@ -39,7 +39,7 @@ class ModelPaymentDivido extends Model
 			select display, plans
 			from %sproduct_divido
 			where product_id = %s
-			", 
+			",
 			DB_PREFIX,
 			$this->db->escape($product_id)
 		);
@@ -65,7 +65,7 @@ class ModelPaymentDivido extends Model
 		if ($display_plans == 'all' || empty($display_plans)) {
 			return $all_plans;
 		}
-		
+
 		$selected_plans = $this->config->get('divido_plans_selected');
 		if (! $selected_plans) {
 			return array();
@@ -86,7 +86,9 @@ class ModelPaymentDivido extends Model
 		if ($plans = $this->cache->get(self::CACHE_KEY_PLANS)) {
 			// OpenCart 2.1 decodes json objects to associative arrays so we
 			// need to make sure we're getting a list of simple objects back.
-			$plans = array_map(function ($plan) { return (object) $plan; }, $plans);
+			$plans = array_map(function ($plan) {
+				return (object)$plan;
+			}, $plans);
 
 			return $plans;
 		}

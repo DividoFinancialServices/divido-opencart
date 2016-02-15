@@ -1,11 +1,11 @@
 <?php
 class ControllerPaymentDivido extends Controller
 {
-	const 
+	const
 		TPL                 = '/template/payment/divido.tpl',
 		TPL_WIDGET          = '/template/payment/divido_widget.tpl',
 		TPL_CALCULATOR      = '/template/payment/divido_calculator.tpl',
-	
+
 		STATUS_ACCEPTED     = 'ACCEPTED',
 		STATUS_DEPOSIT_PAID = 'DEPOSIT-PAID',
 		STATUS_DEFERRED     = 'DEFERRED',
@@ -36,7 +36,7 @@ class ControllerPaymentDivido extends Controller
 		$this->load->model('payment/divido');
 		$this->load->language('payment/divido');
 	}
-	
+
 	public function index ()
 	{
 
@@ -53,10 +53,11 @@ class ControllerPaymentDivido extends Controller
 			}
 		}
 
-		$plans_ids  = array_map(function ($plan) { return $plan->id; }, $plans);
+		$plans_ids  = array_map(function ($plan) {
+			return $plan->id;
+		}, $plans);
 		$plans_ids  = array_unique($plans_ids);
 		$plans_list = implode(',', $plans_ids);
-
 
 		$data = array(
 			'button_confirm'           => $this->language->get('divido_checkout'),
@@ -85,7 +86,7 @@ class ControllerPaymentDivido extends Controller
 		if (file_exists(DIR_TEMPLATE . $override_tpl)) {
 			return $this->load->view($override_tpl, $data);
 		}
-		
+
 		return $this->load->view($default_tpl, $data);
 	}
 
@@ -105,13 +106,13 @@ class ControllerPaymentDivido extends Controller
 		$status_id = $this->status_id[$data->status];
 		$message   = $this->history_messages[$data->status];
 		$notify    = $data->status == self::STATUS_FULFILLED;
-	
+
 		$this->model_checkout_order->addOrderHistory($order_id, $status_id, $message, $notify);
 
 		$this->response->setOutput('ok');
 	}
 
-	public function confirm () 
+	public function confirm ()
 	{
 		ini_set('html_errors', 0);
 		if (! $this->session->data['payment_method']['code'] == 'divido') {
@@ -120,7 +121,7 @@ class ControllerPaymentDivido extends Controller
 
 		$this->load->model('payment/divido');
 		$this->load->language('payment/divido');
-		
+
 		$api_key   = $this->config->get('divido_api_key');
 
 		$deposit = $this->request->post['deposit'];
@@ -160,9 +161,9 @@ class ControllerPaymentDivido extends Controller
 
 		list($total, $totals) = $this->model_payment_divido->getOrderTotals();
 
-		$subTotal   = $total;
-		$cartTotal  = $this->cart->getSubTotal();
-		$shiphandle = $subTotal - $cartTotal;
+		$sub_total  = $total;
+		$cart_total = $this->cart->getSubTotal();
+		$shiphandle = $sub_total - $cart_total;
 
 		$products[] = array(
 			'type'     => 'product',
@@ -242,8 +243,10 @@ class ControllerPaymentDivido extends Controller
 		if (empty($plans)) {
 			return null;
 		}
-		
-		$plans_ids = array_map(function ($plan) { return $plan->id; }, $plans);
+
+		$plans_ids = array_map(function ($plan) {
+			return $plan->id;
+		}, $plans);
 
 		$plan_list = implode(',', $plans_ids);
 
@@ -264,7 +267,7 @@ class ControllerPaymentDivido extends Controller
 			'text_monthly_installment' => $this->language->get('text_monthly_installment'),
 		);
 
-		$filename = $type == 'full' ? self::TPL_CALCULATOR : self::TPL_WIDGET;
+		$filename = ($type == 'full') ? self::TPL_CALCULATOR : self::TPL_WIDGET;
 
 		$tpl  = 'default' . $filename;
 		$override_tpl = $this->config->get('config_template') . $filename;

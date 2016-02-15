@@ -221,7 +221,7 @@
 .divido-theme-light {
 	background-color:#fff;
 	color:#3E4F8B;
-}	
+}
 
 .divido-theme-light p {
 	color:#3E4F8B !important;
@@ -262,7 +262,7 @@
 .divido-theme-blue {
 	background-color:#3E4F8B;
 	color:#fff;
-}	
+}
 
 .divido-theme-blue p {
 	color:#fff !important;
@@ -298,8 +298,8 @@
     border:1px solid #296AB3;
 }
 
-.divido-btn :hover { 
-    background: #3cb0fd; 
+.divido-btn :hover {
+    background: #3cb0fd;
     background-image: -webkit-linear-gradient(top, #3cb0fd, #3498db);
     background-image: -moz-linear-gradient(top, #3cb0fd, #3498db);
     background-image: -ms-linear-gradient(top, #3cb0fd, #3498db);
