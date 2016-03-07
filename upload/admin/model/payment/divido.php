@@ -10,7 +10,7 @@ class ModelPaymentDivido extends Model
 	{
 		$query = sprintf("
 			select display, plans
-			from %sproduct_divido
+			from %sdivido_product
 			where product_id = %s
 			",
 			DB_PREFIX,
@@ -27,7 +27,7 @@ class ModelPaymentDivido extends Model
 		$plans   = $form['divido_plans'];
 		$plans   = implode(',', $plans);
 		$query   = sprintf("
-			replace into %sproduct_divido (product_id, display, plans)
+			replace into %sdivido_product (product_id, display, plans)
 				values (%s, '%s', '%s');
 			",
 			DB_PREFIX,
@@ -90,7 +90,7 @@ class ModelPaymentDivido extends Model
 		// we need to convert to a simple object.
 		$plans_plain = array();
 		foreach ($plans as $plan) {
-			$plan_copy = new stdClass();
+			$plan_copy                     = new stdClass();
 			$plan_copy->id                 = $plan->id;
 			$plan_copy->text               = $plan->text;
 			$plan_copy->country            = $plan->country;
@@ -108,4 +108,5 @@ class ModelPaymentDivido extends Model
 
 		return $plans_plain;
 	}
+
 }

@@ -37,7 +37,7 @@ class ModelPaymentDivido extends Model
 	{
 		$query = sprintf("
 			select display, plans
-			from %sproduct_divido
+			from %sdivido_product
 			where product_id = %s
 			",
 			DB_PREFIX,
@@ -45,6 +45,7 @@ class ModelPaymentDivido extends Model
 		);
 
 		$result = $this->db->query($query);
+
 
 		return $result->row;
 	}
@@ -235,4 +236,16 @@ class ModelPaymentDivido extends Model
 
 		return false;
 	}
+
+    public function hashOrderId($order_id, $salt) {
+        return hash('sha256', $order_id.$salt);
+    }
+
+    public function saveLookup($order_id, $salt) {
+        $this->db->query("REPLACE INTO `" . DB_PREFIX . "divido_lookup` (`order_id`, `salt`) values (" . $order_id . ", '" . $salt . "')");
+    }
+
+    public function getLookupByOrderId($order_id) {
+        return $this->db->query("SELECT * FROM `" . DB_PREFIX . "divido_lookup` where `order_id` = " . $order_id);
+    }
 }
