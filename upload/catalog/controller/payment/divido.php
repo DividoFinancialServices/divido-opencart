@@ -102,6 +102,18 @@ class ControllerPaymentDivido extends Controller
 			return;
 		}
 
+        $lookup = $this->model_payment_divido->getLookupByOrderId($data->metadata->order_id);
+        if ($lookup->num_rows != 1) {
+			$this->response->setOutput('');
+			return;
+        }
+
+        $hash = $this->model_payment_divido->hashOrderId($data->metadata->order_id, $lookup->row['salt']);
+        if ($hash !== $data->metadata->order_hash) {
+			$this->response->setOutput('');
+			return;
+        }
+
 		$order_id  = $data->metadata->order_id;
 		$status_id = $this->status_id[$data->status];
 		$message   = $this->history_messages[$data->status];
@@ -180,6 +192,11 @@ class ControllerPaymentDivido extends Controller
 		}
 		$callback_url = $shop_url . 'index.php?route=payment/divido/update';
 		$return_url   = $shop_url . 'index.php?route=account/order';
+
+        $salt = uniqid('', true);
+        $hash = $this->model_payment_divido->hashOrderId($order_id, $salt);
+
+        $this->model_payment_divido->saveLookup($order_id, $salt);
 
 		$request_data = array(
 			'merchant' => $api_key,
