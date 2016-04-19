@@ -23,9 +23,17 @@ class ModelPaymentDivido extends Model
 
 	public function editSettings ($product_id, $form)
 	{
-		$display = $form['divido_display'];
-		$plans   = $form['divido_plans'];
-		$plans   = implode(',', $plans);
+		$display = 'default';
+		if (! empty($form['divido_display'])) {
+			$display = $form['divido_display'];
+		}
+
+		$plans = '';
+		if (! empty($form['divido_plans'])) {
+			$plans = $form['divido_plans'];
+			$plans = implode(',', $plans);
+		}
+
 		$query   = sprintf("
 			replace into %sdivido_product (product_id, display, plans)
 				values (%s, '%s', '%s');

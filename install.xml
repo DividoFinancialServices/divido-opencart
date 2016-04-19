@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <modification>
 	<name>Divido Financing</name>
-	<code>255</code>
+	<code>256</code>
 	<version>1.0</version>
 	<author>Divido</author>
 	<link>http://www.divido.com</link>
@@ -160,7 +160,8 @@
 
 				$price = 0;
 				if (($this->config->get('config_customer_price') && $this->customer->isLogged()) || !$this->config->get('config_customer_price')) {
-					$price = $this->tax->calculate($product_info['price'], $product_info['tax_class_id'], $this->config->get('config_tax'));
+					$base_price = !empty($product_info['special']) ? $product_info['special'] : $product_info['price'];
+					$price = $this->tax->calculate($base_price, $product_info['tax_class_id'], $this->config->get('config_tax'));
 				} 
 
 				$calc_parameters = array(
