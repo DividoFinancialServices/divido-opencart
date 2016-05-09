@@ -1,4 +1,3 @@
-<script src="<?php echo $merchant_script; ?>"></script>
 <link href="catalog/view/theme/default/stylesheet/divido.css" type="text/css" rel="stylesheet" media="screen">
 <div id="divido-checkout" data-divido-calculator class="divido-calculator divido-theme-blue" data-divido-amount="<?php echo $grand_total; ?>" data-divido-plans="<?php echo $plan_list; ?>">
     <h1>
@@ -43,6 +42,11 @@
 <script>
 (function($) {
     $(function () {
+        $.getScript('<?php echo $merchant_script; ?>', function () {
+            divido_calculator($('#divido-checkout'));
+        });
+
+
         $('#button-confirm').on('click', function() {
             var finance_elem = $('select[name="divido_finance"]');
             var deposit      = $('input[name="divido_deposit"]').val();
