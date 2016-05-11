@@ -7,25 +7,37 @@ class ControllerPaymentDivido extends Controller
 		TPL_CALCULATOR      = '/template/payment/divido_calculator.tpl',
 
 		STATUS_ACCEPTED     = 'ACCEPTED',
-		STATUS_DEPOSIT_PAID = 'DEPOSIT-PAID',
+		STATUS_CANCELED     = 'CANCELED',
+		STATUS_COMPLETED    = 'COMPLETED',
 		STATUS_DEFERRED     = 'DEFERRED',
-		STATUS_SIGNED       = 'SIGNED',
-		STATUS_FULFILLED    = 'FULFILLED';
+		STATUS_DECLINED     = 'DECLINED',
+		STATUS_DEPOSIT_PAID = 'DEPOSIT-PAID',
+		STATUS_FULFILLED    = 'FULFILLED',
+		STATUS_REFERRED     = 'REFERRED',
+		STATUS_SIGNED       = 'SIGNED';
 
 	private $status_id = array(
 		self::STATUS_ACCEPTED     => 1,
-		self::STATUS_DEPOSIT_PAID => 1,
+		self::STATUS_CANCELED     => 1,
+		self::STATUS_COMPLETED    => 1,
 		self::STATUS_DEFERRED     => 1,
-		self::STATUS_SIGNED       => 1,
+		self::STATUS_DECLINED     => 1,
+		self::STATUS_DEPOSIT_PAID => 1,
 		self::STATUS_FULFILLED    => 5,
+		self::STATUS_REFERRED     => 1,
+		self::STATUS_SIGNED       => 1,
 	);
 
 	private $history_messages = array(
 		self::STATUS_ACCEPTED     => 'Credit request accepted',
-		self::STATUS_DEPOSIT_PAID => 'Deposit paid',
+		self::STATUS_CANCELED     => 'Credit request conceled',
+		self::STATUS_COMPLETED    => 'Credit request completed',
 		self::STATUS_DEFERRED     => 'Credit request deferred',
-		self::STATUS_SIGNED       => 'Contract signed',
+		self::STATUS_DECLINED     => 'Credit request declined',
+		self::STATUS_DEPOSIT_PAID => 'Deposit paid',
 		self::STATUS_FULFILLED    => 'Credit request fulfilled',
+		self::STATUS_REFERRED     => 'Credit request referred',
+		self::STATUS_SIGNED       => 'Contract signed',
 	);
 
 
@@ -102,17 +114,17 @@ class ControllerPaymentDivido extends Controller
 			return;
 		}
 
-        $lookup = $this->model_payment_divido->getLookupByOrderId($data->metadata->order_id);
-        if ($lookup->num_rows != 1) {
+		$lookup = $this->model_payment_divido->getLookupByOrderId($data->metadata->order_id);
+		if ($lookup->num_rows != 1) {
 			$this->response->setOutput('');
 			return;
-        }
+		}
 
-        $hash = $this->model_payment_divido->hashOrderId($data->metadata->order_id, $lookup->row['salt']);
-        if ($hash !== $data->metadata->order_hash) {
+		$hash = $this->model_payment_divido->hashOrderId($data->metadata->order_id, $lookup->row['salt']);
+		if ($hash !== $data->metadata->order_hash) {
 			$this->response->setOutput('');
 			return;
-        }
+		}
 
 		$order_id  = $data->metadata->order_id;
 		$status_id = $this->status_id[$data->status];
@@ -186,17 +198,14 @@ class ControllerPaymentDivido extends Controller
 
 		$deposit_amount = round(($deposit / 100) * $total, 2, PHP_ROUND_HALF_UP);
 
-		$shop_url = $this->config->get('config_url');
-		if (isset($this->request->server['HTTPS']) && (($this->request->server['HTTPS'] == 'on') || ($this->request->server['HTTPS'] == '1'))) {
-			$shop_url = $this->config->get('config_ssl');
-		}
-		$callback_url = $shop_url . 'index.php?route=payment/divido/update';
-		$return_url   = $shop_url . 'index.php?route=account/order';
+		$response_url = $this->url->link('payment/divido/update', '', true);
+		$redirect_url = $this->url->link('checkout/success', '', true);
+		$checkout_url = $this->url->link('checkout/checkout', '', true);
 
-        $salt = uniqid('', true);
-        $hash = $this->model_payment_divido->hashOrderId($order_id, $salt);
+		$salt = uniqid('', true);
+		$hash = $this->model_payment_divido->hashOrderId($order_id, $salt);
 
-        $this->model_payment_divido->saveLookup($order_id, $salt);
+		$this->model_payment_divido->saveLookup($order_id, $salt);
 
 		$request_data = array(
 			'merchant' => $api_key,
@@ -219,9 +228,10 @@ class ControllerPaymentDivido extends Controller
 				'mobile_number' => '',
 				'phone_number'  => $telephone,
 			),
-			'products' => $products,
-			'response_url' => $callback_url,
-			'redirect_url' => $return_url,
+			'products'     => $products,
+			'response_url' => $response_url,
+			'redirect_url' => $redirect_url,
+			'checkout_url' => $checkout_url,
 		);
 
 		$response = Divido_CreditRequest::create($request_data);
