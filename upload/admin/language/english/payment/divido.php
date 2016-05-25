@@ -24,3 +24,4 @@ $_['entry_products_options_threshold'] = 'All products above a defined price';
 $_['entry_price_threshold']            = 'Price';
 $_['entry_calc_layout_default']        = 'Default blue theme';
 $_['entry_calc_layout_custom']         = 'Disabled / Custom';
+$_['entry_exclusive']                  = 'Require whole cart to be available on finance';

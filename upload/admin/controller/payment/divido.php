@@ -56,6 +56,7 @@ class ControllerPaymentDivido extends Controller
 		$this->tpldata['divido_price_threshold']  = $this->getVal('divido_price_threshold');
 		$this->tpldata['divido_planselection']    = $this->getVal('divido_planselection');
 		$this->tpldata['divido_plans_selected']   = $this->getVal('divido_plans_selected') ? : array();
+		$this->tpldata['divido_exclusive']        = $this->getVal('divido_exclusive');
 
 		try {
 			$this->tpldata['divido_plans'] = $this->model_payment_divido->getAllPlans();
@@ -106,6 +107,7 @@ class ControllerPaymentDivido extends Controller
 		$this->tpldata['entry_planselection']     = $this->language->get('entry_planselection');
 		$this->tpldata['entry_planlist']          = $this->language->get('entry_planlist');
 		$this->tpldata['entry_price_threshold']   = $this->language->get('entry_price_threshold');
+		$this->tpldata['entry_exclusive']         = $this->language->get('entry_exclusive');
 
 		$this->tpldata['entry_plans_options']     = array(
 			'all'      => $this->language->get('entry_plans_options_all'),
@@ -121,6 +123,11 @@ class ControllerPaymentDivido extends Controller
 		$this->tpldata['entry_calc_options'] = array(
 			'default' => $this->language->get('entry_calc_layout_default'),
 			'custom'  => $this->language->get('entry_calc_layout_custom'),
+		);
+
+		$this->tpldata['entry_exclusive_options'] = array(
+			'0' => 'No',
+			'1' => 'Yes',
 		);
 
 		$this->tpldata['action']                  = $this->url->link('payment/divido', 'token=' . $this->session->data['token'], 'SSL');

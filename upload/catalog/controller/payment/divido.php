@@ -266,7 +266,7 @@ class ControllerPaymentDivido extends Controller
 			return null;
 		}
 
-		$plans = $this->model_payment_divido->getProductPlans($product_id);
+		$plans = $this->model_payment_divido->getProductPlans($product_id, $product_price);
 		if (empty($plans)) {
 			return null;
 		}

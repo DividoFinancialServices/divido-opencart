@@ -133,12 +133,15 @@ class ModelPaymentDivido extends Model
 
 	public function getCartPlans ($cart)
 	{
-		$plans    = array();
-		$products = $cart->getProducts();
+		$exclusive = $this->config->get('divido_exclusive');
+		$plans     = array();
+		$products  = $cart->getProducts();
 		foreach ($products as $product) {
-			$product_plans = $this->getProductPlans($product['product_id']);
+			$product_plans = $this->getProductPlans($product['product_id'], $product['price']);
 			if ($product_plans) {
 				$plans = array_merge($plans, $product_plans);
+			} elseif (!$product_plans && $exclusive) {
+				return array();
 			}
 		}
 
@@ -180,10 +183,11 @@ class ModelPaymentDivido extends Model
 		return array($total, $totals);
 	}
 
-	public function getProductPlans ($product_id)
+	public function getProductPlans ($product_id, $product_price)
 	{
 		$settings          = $this->getProductSettings($product_id);
 		$product_selection = $this->config->get('divido_productselection');
+		$price_threshold   = $this->config->get('divido_price_threshold');
 
 		if (empty($settings)) {
 			$settings = array(
@@ -193,6 +197,10 @@ class ModelPaymentDivido extends Model
 		}
 
 		if ($product_selection == 'selected' && $settings['display'] == 'custom' && empty($settings['plans'])) {
+			return null;
+		}
+
+		if ($product_selection == 'threshold' && $price_threshold > $product_price) {
 			return null;
 		}
 
@@ -237,15 +245,15 @@ class ModelPaymentDivido extends Model
 		return false;
 	}
 
-    public function hashOrderId($order_id, $salt) {
-        return hash('sha256', $order_id.$salt);
-    }
+	public function hashOrderId($order_id, $salt) {
+		return hash('sha256', $order_id.$salt);
+	}
 
-    public function saveLookup($order_id, $salt) {
-        $this->db->query("REPLACE INTO `" . DB_PREFIX . "divido_lookup` (`order_id`, `salt`) values (" . $order_id . ", '" . $salt . "')");
-    }
+	public function saveLookup($order_id, $salt) {
+		$this->db->query("REPLACE INTO `" . DB_PREFIX . "divido_lookup` (`order_id`, `salt`) values (" . $order_id . ", '" . $salt . "')");
+	}
 
-    public function getLookupByOrderId($order_id) {
-        return $this->db->query("SELECT * FROM `" . DB_PREFIX . "divido_lookup` where `order_id` = " . $order_id);
-    }
+	public function getLookupByOrderId($order_id) {
+		return $this->db->query("SELECT * FROM `" . DB_PREFIX . "divido_lookup` where `order_id` = " . $order_id);
+	}
 }

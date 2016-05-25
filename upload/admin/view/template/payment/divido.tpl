@@ -84,13 +84,27 @@
                         </div>
                     </div>
 
+                    <!--
                     <div class="form-group">
                         <label class="col-sm-2 control-label" for="divido_prependtoprice"><?php echo $entry_prependtoprice; ?></label>
                         <div class="col-sm-10">
                             <input type="text" id="divido_prependtoprice" class="form-control" name="divido_prependtoprice" value="<?php echo $divido_prependtoprice; ?>" >
                         </div>
                     </div>
+                    -->
 
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="divido_exclusive"><?php echo $entry_exclusive; ?></label>
+                        <div class="col-sm-10">
+                            <select name="divido_exclusive" id="divido_exclusive" class="form-control">
+                                <?php foreach ($entry_exclusive_options as $option => $text): $selected = $option == $divido_exclusive ? 'selected' : null; ?>
+                                <option value="<?php echo $option; ?>" <?php echo $selected; ?>><?php echo $text; ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!--
                     <div class="form-group">
                         <label class="col-sm-2 control-label" for="divido_calc_layout"><?php echo $entry_calc_layout; ?></label>
                         <div class="col-sm-10">
@@ -101,6 +115,7 @@
                             </select>
                         </div>
                     </div>
+                    -->
 
                     <div class="form-group">
                         <label class="col-sm-2 control-label" for="divido_productselection"><?php echo $entry_productselection; ?></label>
