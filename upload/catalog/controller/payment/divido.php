@@ -235,6 +235,7 @@ class ControllerPaymentDivido extends Controller
 			'currency' => $currency,
 			'metadata' => array(
 				'order_id' => $order_id,
+				'order_hash' => $hash,
 			),
 			'customer' => array(
 				'title'         => '',
