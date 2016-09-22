@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+fswatch -o upload/ | xargs -n1 -I{} cp -R upload/* ../opencart22/
+fswatch -o upload/ | xargs -n1 -I{} cp -R upload/* ../opencart20/
 fswatch -o upload/ | xargs -n1 -I{} cp -R upload/* ../opencart21/
 
 function pack_module {

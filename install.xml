@@ -2,7 +2,7 @@
 <modification>
 	<name>Divido Financing</name>
 	<code>268</code>
-	<version>1.2.2</version>
+	<version>1.2.3</version>
 	<author>Divido</author>
 	<link>http://www.divido.com</link>
 	<file path="admin/controller/catalog/product.php">

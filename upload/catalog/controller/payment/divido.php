@@ -2,9 +2,14 @@
 class ControllerPaymentDivido extends Controller
 {
 	const
-		TPL                 = '/template/payment/divido.tpl',
-		TPL_WIDGET          = '/template/payment/divido_widget.tpl',
-		TPL_CALCULATOR      = '/template/payment/divido_calculator.tpl',
+		TPL                  = '/template/payment/divido.tpl',
+		TPL_WIDGET           = '/template/payment/divido_widget.tpl',
+		TPL_CALCULATOR       = '/template/payment/divido_calculator.tpl',
+
+		TPL_22               = '/payment/divido.tpl',
+		TPL_WIDGET_22        = '/payment/divido_widget.tpl',
+		TPL_CALCULATOR_22    = '/payment/divido_calculator.tpl',
+
 		STATUS_ACCEPTED      = 'ACCEPTED',
 		STATUS_ACTION_LENDER = 'ACTION-LENDER',
 		STATUS_CANCELED      = 'CANCELED',
@@ -15,6 +20,8 @@ class ControllerPaymentDivido extends Controller
 		STATUS_REFERRED      = 'REFERRED',
 		STATUS_FULFILLED     = 'FULFILLED',
 		STATUS_SIGNED        = 'SIGNED';
+
+	private $is22;
 
 	private $status_id = array(
 		self::STATUS_ACCEPTED      => 1,
@@ -46,6 +53,8 @@ class ControllerPaymentDivido extends Controller
 	{
 		parent::__construct($registry);
 
+		$this->is22 = VERSION >= '2.2.0.0';
+
 		$this->load->model('payment/divido');
 		$this->load->language('payment/divido');
 	}
@@ -57,7 +66,13 @@ class ControllerPaymentDivido extends Controller
 		$key_parts = explode('.', $api_key);
 		$js_key    = strtolower(array_shift($key_parts));
 
-		list($total, $totals) = $this->model_payment_divido->getOrderTotals();
+		if ($this->is22) {
+			list($total, $totals) = $this->model_payment_divido->getOrderTotals22();
+		} else {
+			list($total, $totals) = $this->model_payment_divido->getOrderTotals();
+		}
+
+		$sub_total  = $total;
 
 		$plans = $this->model_payment_divido->getCartPlans($this->cart);
 		foreach ($plans as $key => $plan) {
@@ -94,8 +109,9 @@ class ControllerPaymentDivido extends Controller
 			'generic_credit_req_error' => 'Credit request could not be initiated',
 		);
 
-		$default_tpl  = 'default' . self::TPL;
-		$override_tpl = $this->config->get('config_template') . self::TPL;
+        
+		$default_tpl  = $this->is22 ? self::TPL_22 : 'default' . self::TPL;
+		$override_tpl = $this->config->get('config_template') . ($this->is22 ? self::TPL_22 : self::TPL);
 		if (file_exists(DIR_TEMPLATE . $override_tpl)) {
 			return $this->load->view($override_tpl, $data);
 		}
@@ -202,7 +218,11 @@ class ControllerPaymentDivido extends Controller
 			);
 		}
 
-		list($total, $totals) = $this->model_payment_divido->getOrderTotals();
+		if ($this->is22) {
+			list($total, $totals) = $this->model_payment_divido->getOrderTotals22();
+		} else {
+			list($total, $totals) = $this->model_payment_divido->getOrderTotals();
+		}
 
 		$sub_total  = $total;
 		$cart_total = $this->cart->getSubTotal();
@@ -314,9 +334,13 @@ class ControllerPaymentDivido extends Controller
 			'text_monthly_installment' => $this->language->get('text_monthly_installment'),
 		);
 
-		$filename = ($type == 'full') ? self::TPL_CALCULATOR : self::TPL_WIDGET;
+		if ($type == 'full') {
+			$filename = $this->is22 ? self::TPL_CALCULATOR_22 : 'default' . self::TPL_CALCULATOR;
+		} else {
+			$filename = $this->is22 ? self::TPL_WIDGET_22 : 'default' . self::TPL_WIDGET;
+		}
 
-		$tpl  = 'default' . $filename;
+		$tpl  = $filename;
 		$override_tpl = $this->config->get('config_template') . $filename;
 		if (file_exists(DIR_TEMPLATE . $override_tpl)) {
 			$tpl = $override_tpl;
