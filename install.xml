@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <modification>
 	<name>Divido Financing</name>
-	<code>268</code>
-	<version>1.2.3</version>
+	<code>270</code>
+	<version>1.3.0</version>
 	<author>Divido</author>
 	<link>http://www.divido.com</link>
 	<file path="admin/controller/catalog/product.php">
@@ -49,18 +49,6 @@
 			}
 			$data['divido_plans']	  = $divido_plans;
 			$data['divido_display']   = $divido_display;
-			]]></add>
-		</operation>
-	</file>
-	<file path="catalog/controller/checkout/payment_method.php">
-		<operation>
-			<search><![CDATA[
-			if ($method) {
-			]]></search>
-			<add position="after"><![CDATA[
-			if (method_exists($this->{'model_payment_' . $result['code']}, 'isApplicable') && ! $this->{'model_payment_' . $result['code']}->isApplicable()) {
-				continue; 
-			}
 			]]></add>
 		</operation>
 	</file>
