@@ -135,6 +135,13 @@
                         </div>
                     </div>
 
+                    <div id="cart-threshold" class="form-group">
+                        <label class="col-sm-2 control-label" for="divido_cart_threshold"><span data-toggle="tooltip" title="<?php echo $help_cart_threshold; ?>"><?php echo $entry_cart_threshold; ?></span></label>
+                        <div class="col-sm-10">
+                            <input type="text" name="divido_cart_threshold" value="<?php echo $divido_cart_threshold; ?>" class="form-control" id="divido_cart_threshold">
+                        </div>
+                    </div>
+
                     <div class="form-group">
                         <label class="col-sm-2 control-label" for="divido_planselection"><?php echo $entry_planselection; ?></label>
                         <div class="col-sm-10">

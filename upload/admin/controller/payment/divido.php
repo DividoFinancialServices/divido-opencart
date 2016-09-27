@@ -57,6 +57,7 @@ class ControllerPaymentDivido extends Controller
 		$this->tpldata['divido_planselection']    = $this->getVal('divido_planselection');
 		$this->tpldata['divido_plans_selected']   = $this->getVal('divido_plans_selected') ? : array();
 		$this->tpldata['divido_exclusive']        = $this->getVal('divido_exclusive');
+		$this->tpldata['divido_cart_threshold']   = $this->getVal('divido_cart_threshold');
 
 		try {
 			$this->tpldata['divido_plans'] = $this->model_payment_divido->getAllPlans();
@@ -108,6 +109,7 @@ class ControllerPaymentDivido extends Controller
 		$this->tpldata['entry_planlist']          = $this->language->get('entry_planlist');
 		$this->tpldata['entry_price_threshold']   = $this->language->get('entry_price_threshold');
 		$this->tpldata['entry_exclusive']         = $this->language->get('entry_exclusive');
+		$this->tpldata['entry_cart_threshold']    = $this->language->get('entry_cart_threshold');
 
 		$this->tpldata['entry_plans_options']     = array(
 			'all'      => $this->language->get('entry_plans_options_all'),
