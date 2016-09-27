@@ -8,12 +8,14 @@ class ModelPaymentDivido extends Model
 	const CACHE_KEY_PLANS = 'divido_plans';
 
 	private $api_key;
+	private $is22;
 
 	public function __construct ($registry)
 	{
 		parent::__construct($registry);
 
 		$this->api_key = $this->config->get('divido_api_key');
+		$this->is22 = VERSION >= '2.2.0.0';
 
 		if ($this->api_key) {
 			Divido::setMerchant($this->api_key);
@@ -29,6 +31,10 @@ class ModelPaymentDivido extends Model
 			'terms'      => '',
 			'sort_order' => $this->config->get('divido_sort_order')
 		);
+
+		if (! $this->isApplicable()) {
+			return array();
+		}
 
 		return $method_data;
 	}
@@ -278,8 +284,18 @@ class ModelPaymentDivido extends Model
 			return false;
 		}
 
-		$plans          = $this->model_payment_divido->getCartPlans($this->cart);
-		list($subtotal) = $this->getOrderTotals();
+		if ($this->is22) {
+			list($subtotal) = $this->getOrderTotals22();
+		} else {
+			list($subtotal) = $this->getOrderTotals();
+		}
+
+		$cart_threshold = $this->config->get('divido_cart_threshold');
+		if ($cart_threshold && $subtotal < $cart_threshold) {
+			return false;
+		}
+
+		$plans = $this->model_payment_divido->getCartPlans($this->cart);
 		foreach ($plans as $plan) {
 			if ($plan->min_amount <= $subtotal) {
 				return true;
