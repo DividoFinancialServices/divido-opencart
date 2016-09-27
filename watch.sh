@@ -1,16 +1,13 @@
 #!/usr/bin/env bash
-fswatch -o upload/ | xargs -n1 -I{} cp -R upload/* ../opencart22/
-fswatch -o upload/ | xargs -n1 -I{} cp -R upload/* ../opencart20/
-fswatch -o upload/ | xargs -n1 -I{} cp -R upload/* ../opencart21/
 
-function pack_module {
+function upd {
     date
-    perl -p -i -e 's/(<code>)(\d+)(<\/code>)/$1.($2+1).$3/e' install.xml 
-    zip -r ../opencart20-module.ocmod.zip *
-
+    cp -R upload/* ../opencart20/
+    cp -R upload/* ../opencart21/
+    cp -R upload/* ../opencart22/
+    echo "done"
 }
 
-export -f pack_module
+export -f upd
 
-#fswatch -o install* src/ | xargs -n1 -I {} bash -c 'pack_module'
-
+fswatch -o upload/ | xargs -n1 -I{} bash -c "upd"
