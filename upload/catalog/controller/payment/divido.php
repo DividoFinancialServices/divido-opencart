@@ -109,7 +109,6 @@ class ControllerPaymentDivido extends Controller
 			'generic_credit_req_error' => 'Credit request could not be initiated',
 		);
 
-        
 		$default_tpl  = $this->is22 ? self::TPL_22 : 'default' . self::TPL;
 		$override_tpl = $this->config->get('config_template') . ($this->is22 ? self::TPL_22 : self::TPL);
 		if (file_exists(DIR_TEMPLATE . $override_tpl)) {
@@ -188,7 +187,13 @@ class ControllerPaymentDivido extends Controller
 
 		$country  = $this->session->data['payment_address']['iso_code_2'];
 		$language = strtoupper($this->language->get('code'));
-		$currency = strtoupper($this->currency->getCode());
+
+		if ($this->is22) {
+			$currency = strtoupper($this->config->get('config_currency'));
+		} else {
+			$currency = strtoupper($this->currency->getCode());
+		}
+
 		$order_id = $this->session->data['order_id'];
 
 		if ($this->customer->isLogged()) {
