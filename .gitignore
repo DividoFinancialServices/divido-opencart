@@ -1,4 +1,4 @@
-watch.sh
 *.ocmod.zip
 release/
 .DS_Store
+htdocs/opencart/*
