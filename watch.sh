@@ -2,9 +2,9 @@
 
 function upd {
     date
-    cp -R upload/* ../opencart20/
-    cp -R upload/* ../opencart21/
-    cp -R upload/* ../opencart22/
+    cp -R upload/* htdocs/opencart/opencart20/
+    cp -R upload/* htdocs/opencart/opencart21/
+    cp -R upload/* htdocs/opencart/opencart22/
     echo "done"
 }
 
