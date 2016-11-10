@@ -11,4 +11,7 @@ RUN apt-get update && apt-get install -y \
 RUN pecl install xdebug 
 RUN docker-php-ext-install pdo_mysql mcrypt
 RUN a2enmod rewrite
-EXPOSE 80
+RUN addgroup --gid 8000 divido
+RUN useradd -M -d /var/www -g 8000 -u 8000 divido
+ENV APACHE_RUN_USER divido
+ENV APACHE_RUN_GROUP divido
