@@ -1,0 +1,62 @@
+<script>
+    var dividoKey = "{{ api_key }}";
+</script>
+<style>
+    #divido-widget{
+        padding-bottom:5px;
+    }
+</style>
+
+<script src="https://cdn.divido.com/calculator/v2.1/production/js/template.divido.js"></script>
+<form id="financePluginForm" method="post" >
+    <div
+        data-divido-widget
+        data-divido-prefix="{{prefix}}"
+        data-divido-suffix="{{suffix}}"
+        data-divido-title-logo
+        data-divido-amount="{{amount}}"
+        data-divido-apply="true"
+        data-divido-apply-label="Apply Now"
+        data-divido-plans="{{basket_plans}}"
+        >
+    </div>
+</form>
+<p>{{ text_redirection }}</p>
+
+<div class="buttons">
+    <div class="pull-right">
+        <input type="button" value="{{ button_confirm }}" id="button-confirm" class="btn btn-primary" data-loading-text="{{ text_loading }}" />
+    </div>
+</div>
+
+<script>
+(function($) {
+    $(function () {
+
+        $('#button-confirm').click(function() {
+            var data = $("#financePluginForm").serializeArray();
+            $.ajax({
+                type     : 'post',
+                url      : 'index.php?route=extension/payment/financePlugin/confirm',
+                data     : data,
+                dataType : 'json',
+                cache    : false,
+                beforeSend: function() {
+                    $('#button-confirm').button('loading');
+                },
+                complete: function() {
+                    $('#button-confirm').button('reset');
+                },
+                success: function(data) {
+                    if (data.status == 'ok') {
+                        location = data.url;
+                    } else {
+                        message = data.message || '{{ generic_credit_req_error }}';
+                        $('#divido-checkout').prepend('<div class="alert alert-warning alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + message + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+                    }
+                }
+            });
+        });
+    });
+})(jQuery);
+</script>

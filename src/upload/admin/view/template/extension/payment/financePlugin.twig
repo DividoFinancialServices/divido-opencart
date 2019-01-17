@@ -1,0 +1,210 @@
+{{ header }} {{ column_left }}
+<div id="content">
+    <div class="page-header">
+        <div class="container-fluid">
+            <div class="pull-right">
+                <button type="submit" form="form-payment" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+                <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a></div>
+            <h1>{{ heading_title }}</h1>      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+        <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+        </div>
+    </div>
+    <div class="container-fluid">
+	{% if error_warning %}
+		<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+		  <button type="button" class="close" data-dismiss="alert">&times;</button>
+		</div>
+	{% endif %}
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_edit }}</h3>
+            </div>
+            <div class="panel-body">
+                <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-payment" class="form-horizontal">
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="api_key"><span data-toggle="tooltip" title="{{ help_api_key }}">{{ entry_api_key }}</span></label>
+                        <div class="col-sm-10">
+                            <input id="api_key" class="form-control" type="text" name="payment_financePlugin_api_key" value="{{ payment_financePlugin_api_key }}" size="60">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="financePlugin_status"><span data-toggle="tooltip" title="{{ help_status }}">{{ entry_status }}</span></label>
+                        <div class="col-sm-10">
+                            <select name="payment_financePlugin_status" id="financePlugin_status" class="form-control">
+                                <option value="1" >{{ text_enabled }}</option>
+                                <option value="0" {% if payment_financePlugin_status == '0' %} selected="selected" {% endif %}>{{ text_disabled }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="financePlugin_order_status_id"><span data-toggle="tooltip" title="{{ help_order_status }}">{{ entry_order_status }}</span></label>
+                        <div class="col-sm-10">
+                            <select name="payment_financePlugin_order_status_id" id="financePlugin_order_status_id" class="form-control">
+                                {% for order_status in order_statuses %}
+                                <option value="{{ order_status.order_status_id }}" {% if order_status.order_status_id == payment_financePlugin_order_status_id %} selected="selected" {% endif %}>{{ order_status.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="financePlugin_title"><span data-toggle="tooltip" title="{{ help_title }}">{{ entry_title }}</span></label>
+                        <div class="col-sm-10">
+                            <input type="text" id="financePlugin_title" name="payment_financePlugin_title" value="{{ payment_financePlugin_title }}" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="financePlugin_planselection"><span data-toggle="tooltip" title="{{ help_planselection }}">{{ entry_planselection }}</span></label>
+                        <div class="col-sm-10">
+                            <select name="payment_financePlugin_planselection" id="financePlugin_planselection" class="form-control">
+                                {% for option, text in entry_plans_options %}
+                                <option value="{{ option }}" {% if option == payment_financePlugin_planselection %}selected="selected"{% endif %}>{{ text }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="plan-list" class="form-group">
+                        <label class="col-sm-2 control-label">{{ entry_planlist }}</label>
+                        <div class="col-sm-10">
+                            {% for plan in financePlugin_plans %}
+                            <label>
+                                <input type="checkbox" name="payment_financePlugin_plans_selected[]" value="{{ plan.id }}" {% if plan.id in payment_financePlugin_plans_selected %} checked="checked" {% endif %}>
+                                {{ plan.text }} {{ plan.interest_rate }}% APR
+                            </label><br>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="financePlugin_productselection"><span data-toggle="tooltip" title="{{ help_productselection }}">{{ entry_productselection }}</span></label>
+                        <div class="col-sm-10">
+                            <select name="payment_financePlugin_productselection" id="financePlugin_productselection" class="form-control">
+                                {% for option, text in entry_products_options %}
+                                <option value="{{ option }}" {% if option == payment_financePlugin_productselection %}selected="selected"{% endif %}>{{ text }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="threshold" class="form-group">
+                        <label class="col-sm-2 control-label" for="financePlugin_price_threshold">{{ entry_price_threshold }}</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="payment_financePlugin_price_threshold" value="{{ payment_financePlugin_price_threshold }}" class="form-control" id="financePlugin_price_threshold">
+                        </div>
+                    </div>
+
+                    <div id="cart-threshold" class="form-group">
+                        <label class="col-sm-2 control-label" for="financePlugin_cart_threshold"><span data-toggle="tooltip" title="{{ help_cart_threshold }}">{{ entry_cart_threshold }}</span></label>
+                        <div class="col-sm-10">
+                            <input type="text" name="payment_financePlugin_cart_threshold" value="{{ payment_financePlugin_cart_threshold }}" class="form-control" id="financePlugin_cart_threshold">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="sort_order">{{ entry_sort_order }}</label>
+                        <div class="col-sm-10">
+                            <input type="text" id="payment_financePlugin_sort_order" class="form-control" name="payment_financePlugin_sort_order" value="{{ payment_financePlugin_sort_order }}" size="1">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="category"><span data-toggle="tooltip" title="{{ help_category }}">{{ entry_category }}</span></label>
+                        <div class="col-sm-10">
+                            <input type="text" name="category" value="" placeholder="{{ entry_category }}" id="category" class="form-control" />
+                            <div id="financePlugin-category" class="well well-sm" style="height: 150px; overflow: auto;">
+                            {% for category in categories %}
+                                <div id="category{{ category.category_id }}"><i class="fa fa-minus-circle"></i> {{ category.name }}
+                                    <input type="hidden" name="payment_financePlugin_categories[]" value="{{ category.category_id }}" />
+                                </div>
+                            {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+(function($) {
+    var financePlugin = {
+        initialize: function () {
+            this.bindEvents();
+            this.toggleFields();
+        },
+
+        bindEvents: function () {
+            $('#financePlugin_productselection').on('change', this.toggleFields);
+            $('#financePlugin_planselection').on('change', this.toggleFields);
+
+        },
+
+        toggleFields: function () {
+            var $apiKeyField = $('#api_key');
+
+            if ($apiKeyField.val().length < 1) {
+                $apiKeyField.closest('.form-group').siblings().hide();
+            }
+
+            var productSelection = $('#financePlugin_productselection').val();
+            var $threshold       = $('#threshold');
+            if (productSelection == 'threshold') {
+                $threshold.show();
+            } else if (productSelection == 'selected') {
+                $threshold.hide();
+            } else {
+                $threshold.hide();
+            }
+
+            var planSelection = $('#financePlugin_planselection').val();
+            var $planList     = $('#plan-list');
+            if (planSelection == 'selected') {
+                $planList.show();
+            } else {
+                $planList.hide();
+            }
+        }
+    };
+
+    $(function () {
+        financePlugin.initialize();
+    });
+
+	$('input[name="category"]').autocomplete({
+		source: function(request, response) {
+			$.ajax({
+				url: 'index.php?route=catalog/category/autocomplete&user_token={{ user_token }}&filter_name=' +  encodeURIComponent(request),
+				dataType: 'json',
+				success: function(json) {
+					response($.map(json, function(item) {
+						return {
+							label: item['name'],
+							value: item['category_id']
+						}
+					}));
+				}
+			});
+		},
+		select: function(item) {
+			$('input[name=\'category\']').val('');
+			$('#financePlugin-category' + item['value']).remove();
+			$('#financePlugin-category').append('<div id="financePlugin-category' + item['value'] + '"><i class="fa fa-minus-circle"></i> ' + item['label'] + '<input type="hidden" name="payment_financePlugin_categories[]" value="' + item['value'] + '" /></div>');
+		}
+	});
+
+	$('#financePlugin-category').delegate('.fa-minus-circle', 'click', function() {
+		$(this).parent().remove();
+	});
+
+})(jQuery);
+</script>
+{{ footer }}

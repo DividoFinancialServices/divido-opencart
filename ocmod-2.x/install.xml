@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+	<name>Divido Financing</name>
+	<code>271</code>
+	<version>1.3.0</version>
+	<author>Divido</author>
+	<link>http://www.divido.com</link>
+	<file path="admin/controller/catalog/product.php">
+		<operation>
+			<search><![CDATA[
+			$this->model_catalog_product->editProduct($this->request->get['product_id'], $this->request->post);
+			]]></search>
+			<add position="after"><![CDATA[
+			$this->load->model('payment/divido');
+			$this->model_payment_divido->editSettings($this->request->get['product_id'], $this->request->post);
+			]]></add>
+		</operation>
+		<operation>
+			<search><![CDATA[
+			$this->response->setOutput($this->load->view('catalog/product_form.tpl', $data));
+			]]></search>
+			<add position="before"><![CDATA[
+			// Divido
+			$this->load->model('payment/divido');
+
+            $divido_settings = array();
+            if (! empty($this->request->get['product_id'])) {
+			    $divido_settings = $this->model_payment_divido->getSettings($this->request->get['product_id']);
+            }
+
+			$divido_display = 'default';
+			if (isset($this->request->post['divido_display'])) {
+				$divido_display = $this->request->post['divido_display'];
+			} elseif (! empty($divido_settings['display'])) {
+				$divido_display = $divido_settings['display'];
+			}
+
+			$divido_plans = array();
+			if (! empty($this->request->post['divido_plans'])) {
+				$divido_plans = $this->request->post['divido_plans'];
+			} elseif (! empty($divido_settings['plans'])) {
+				$divido_plans = explode(',', $divido_settings['plans']);
+			}
+
+			try {
+				$data['divido_all_plans'] = $this->model_payment_divido->getAllPlans();
+			} catch (Exception $e) {
+				$data['divido_all_plans'] = array();
+			}
+			$data['divido_plans']	  = $divido_plans;
+			$data['divido_display']   = $divido_display;
+			]]></add>
+		</operation>
+	</file>
+	<file path="admin/view/template/catalog/product_form.tpl">
+		<operation>
+			<search><![CDATA[
+			<li><a href="#tab-design" data-toggle="tab"><?php echo $tab_design; ?></a></li>
+			]]></search>
+			<add position="after"><![CDATA[
+			<li><a href="#tab-divido" data-toggle="tab">Divido</a></li>
+			]]></add>
+		</operation>
+
+		<operation>
+			<search><![CDATA[
+				<div class="tab-pane" id="tab-design">
+			]]></search>
+			<add position="before"><![CDATA[
+			<div class="tab-pane" id="tab-divido">
+				<div class="form-group">
+					<label class="col-sm-2 control-label">Available on finance</label>
+					<div class="col-sm-10">
+						<div>
+							<label class="radio-inline">
+								<input type="radio" name="divido_display" value="default" <?php if ($divido_display != 'custom') { ?>checked<?php } ?>>
+								Default settings
+							</label>
+						</div>
+						<div>
+							<label class="radio-inline">
+								<input type="radio" name="divido_display" value="custom" <?php if ($divido_display == 'custom') { ?>checked<?php } ?>>
+								Selected plans
+							</label>
+						</div>
+					</div>
+				</div>
+				<div id="divido-plans" class="form-group">
+					<label class="col-sm-2 control-label">Selected plans</label>
+					<div class="col-sm-10">
+						<?php foreach ($divido_all_plans as $plan): ?>
+						<div>
+							<label class="checkbox-inline">
+								<input type="checkbox" name="divido_plans[]" value="<?php echo $plan->id; ?>" <?php if (in_array($plan->id, $divido_plans)) echo "checked"; ?>>
+								<?php echo "{$plan->text} ({$plan->interest_rate}% APR)"; ?>
+							</label>
+						</div>
+						<?php endforeach; ?>
+					</div>
+				</div>
+			</div>
+			<script>
+				(function($) {
+					var divido = {
+						initialize: function () {
+							this.bindEvents();
+							this.toggleFields();
+						},
+
+						bindEvents: function () {
+							$('input:radio[name=divido_display]').on('change', this.toggleFields);
+						},
+
+						toggleFields: function () {
+							var display = $('input:radio[name=divido_display]:checked').val();
+
+							if (display == 'default') {
+								$('#divido-plans').hide();
+							} else {
+								$('#divido-plans').show();
+							}
+						}
+					};
+
+					$(function () {
+						divido.initialize();
+					});
+
+				})(jQuery);
+			</script>
+			]]></add>
+		</operation>
+	</file>  
+	<file path="catalog/controller/product/product.php">
+		<operation>
+			<search><![CDATA[
+				$data['column_left'] = $this->load->controller('common/column_left');
+			]]></search>
+			<add position="before"><![CDATA[
+			$this->load->model('payment/divido');
+            $data['divido_calc'] = $data['divido_widget'] = null;
+			if ($this->model_payment_divido->isEnabled()) {
+				if ($this->config->get('divido_calc_layout') == 'default') {
+					$this->document->addStyle('catalog/view/theme/default/stylesheet/divido.css');
+				}
+
+				$api_key   = $this->config->get('divido_api_key');
+				$key_parts = explode('.', $api_key);
+				$js_key    = strtolower(array_shift($key_parts));
+				$this->document->addScript("//cdn.divido.com/calculator/{$js_key}.js");
+
+				$price = 0;
+				if (($this->config->get('config_customer_price') && $this->customer->isLogged()) || !$this->config->get('config_customer_price')) {
+					$base_price = !empty($product_info['special']) ? $product_info['special'] : $product_info['price'];
+					$price = $this->tax->calculate($base_price, $product_info['tax_class_id'], $this->config->get('config_tax'));
+				} 
+
+				$calc_parameters = array(
+					'product_id' => $product_id, 
+					'price'		 => $price,
+					'type'		 => 'full',
+				);
+				$data['divido_calc']   = $this->load->controller('payment/divido/calculator', $calc_parameters);
+				$calc_parameters['type'] = 'minimal';
+				$data['divido_widget'] = $this->load->controller('payment/divido/calculator', $calc_parameters);
+			}
+			]]></add>
+		</operation>
+	</file>
+</modification>
