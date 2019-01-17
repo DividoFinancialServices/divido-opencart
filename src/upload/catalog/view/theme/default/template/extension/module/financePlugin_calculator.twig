@@ -1,0 +1,16 @@
+<script>
+    var dividoKey = "{{ api_key }}";
+  </script>
+
+  <script src="https://cdn.divido.com/calculator/v2.1/production/js/template.divido.js"></script>
+  <div
+    id="divido-widget"
+    data-divido-widget
+    data-divido-plans="{{ plan_list }}"
+    data-divido-prefix=""
+    data-divido-suffix=""
+    data-divido-amount="{{ product_price }}"
+    data-divido-apply="true"
+    data-divido-apply-label="Apply Now"
+  >
+  </div>
